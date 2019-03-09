@@ -1,9 +1,9 @@
-defmodule EchoSSE.MixProject do
+defmodule EchoAtom.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :echo_sse,
+      app: :echo_atom,
       version: "0.1.0",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
@@ -14,7 +14,7 @@ defmodule EchoSSE.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      mod: {EchoSSE, []},
+      mod: {EchoAtom, []},
       extra_applications: [:logger]
     ]
   end
@@ -22,7 +22,6 @@ defmodule EchoSSE.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:poison, "~> 4.0"},
       {:wiki_elixir, github: "adamwight/wiki_elixir"}
       # To use the local code:
       #{:wiki_elixir, path: "../../"}

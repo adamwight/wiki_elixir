@@ -8,16 +8,9 @@ defmodule WikiRecentChangesFeed do
 
   @recent_changes_feed "https://en.wikipedia.org/w/api.php?hidebots=1&hidecategorization=1&hideWikibase=1&urlversion=1&days=7&limit=50&action=feedrecentchanges&feedformat=atom"
 
-  @doc """
-
-  """
-  def start(:normal, []) do
-    start(:normal, [@recent_changes_feed, &WikiRecentChangesFeed.demo_edit_line/1])
-  end
-
-  def start(:normal, [endpoint, edit_callback]) do
+  def start_link(edit_callback, endpoint \\ @recent_changes_feed) do
     Task.start_link(fn ->
-      parse_atom(endpoint, edit_callback)
+      parse_atom(edit_callback, endpoint)
     end)
   end
 
@@ -29,7 +22,7 @@ defmodule WikiRecentChangesFeed do
     atom_response(endpoint).body
   end
 
-  defp parse_atom(endpoint, edit_callback) do
+  defp parse_atom(edit_callback, endpoint) do
     :feeder.stream atom_content(endpoint), initial_opts(edit_callback)
   end
 
@@ -55,12 +48,5 @@ defmodule WikiRecentChangesFeed do
 
   def event(:endFeed, {feed, entries}, _) do
     {feed, Enum.reverse(entries)}
-  end
-
-  @doc """
-  Print edit lines to stdout.
-  """
-  def demo_edit_line({_, author, _, _, _, diff_url, _, _, _, _html, title, timestamp}) do
-    IO.puts "#{timestamp}: #{author} edited #{title}: #{diff_url}"
   end
 end
