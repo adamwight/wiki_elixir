@@ -22,7 +22,7 @@ defmodule EchoAtom.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:wiki_elixir, github: "adamwight/wiki_elixir"}
+      {:wiki_elixir, "~> 0.1"}
       # To use the local code:
       #{:wiki_elixir, path: "../../"}
     ]

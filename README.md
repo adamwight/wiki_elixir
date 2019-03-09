@@ -14,7 +14,7 @@ The package can be installed by adding `wiki_elixir` to your list of dependencie
 ```elixir
 def deps do
   [
-    {:wiki_elixir, github: "adamwight/wiki_elixir"}
+    {:wiki_elixir, "~> 0.1"}
   ]
 end
 ```
