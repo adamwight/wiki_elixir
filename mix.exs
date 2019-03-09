@@ -24,9 +24,10 @@ defmodule Elixir.MixProject do
   defp deps do
     [
       {:eventsource_ex, "~> 0.0.2"},
-      {:feeder, "~> 2.3.0"},
-      {:httpotion, "~> 3.1.0"},
-      {:poison, "~> 4.0.1"}
+      {:ex_doc, "~> 0.19"},
+      {:feeder, "~> 2.3"},
+      {:httpotion, "~> 3.1"},
+      {:poison, "~> 4.0"}
     ]
   end
 end

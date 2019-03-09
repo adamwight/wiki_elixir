@@ -1,21 +1,19 @@
-# Elixir
+# Wiki Elixir
 
-**TODO: Add description**
+This project provides Elixir connectors to work with Wikipedia (and other
+MediaWiki) data sources.  It supports realtime feed processing and (TODO) API calls.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `elixir` to your list of dependencies in `mix.exs`:
+The package can be installed by adding `wiki_elixir` to your list of dependencies in
+`mix.exs`, currently only available from GitHub:
 
 ```elixir
 def deps do
   [
-    {:elixir, "~> 0.1.0"}
+    {:wiki_elixir, github: "adamwight/wiki_elixir"}
   ]
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/elixir](https://hexdocs.pm/elixir).
-
+Documentation can be generated with `mix docs`.

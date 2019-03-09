@@ -9,6 +9,7 @@ defmodule WikiRecentChangesFeed do
   @recent_changes_feed "https://en.wikipedia.org/w/api.php?hidebots=1&hidecategorization=1&hideWikibase=1&urlversion=1&days=7&limit=50&action=feedrecentchanges&feedformat=atom"
 
   @doc """
+
   """
   def start(:normal, []) do
     start(:normal, [@recent_changes_feed, &WikiRecentChangesFeed.demo_edit_line/1])
@@ -20,11 +21,11 @@ defmodule WikiRecentChangesFeed do
     end)
   end
 
-  def atom_response(endpoint) do
+  defp atom_response(endpoint) do
     HTTPotion.get endpoint
   end
 
-  def atom_content(endpoint) do
+  defp atom_content(endpoint) do
     atom_response(endpoint).body
   end
 
@@ -39,6 +40,7 @@ defmodule WikiRecentChangesFeed do
     ]
   end
 
+  @doc false
   def event({:entry, entry}, {feed, entries}, edit_callback) do
     Task.start_link(fn ->
       edit_callback.(entry)
@@ -55,6 +57,9 @@ defmodule WikiRecentChangesFeed do
     {feed, Enum.reverse(entries)}
   end
 
+  @doc """
+  Print edit lines to stdout.
+  """
   def demo_edit_line({_, author, _, _, _, diff_url, _, _, _, _html, title, timestamp}) do
     IO.puts "#{timestamp}: #{author} edited #{title}: #{diff_url}"
   end
