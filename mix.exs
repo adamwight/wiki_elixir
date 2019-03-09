@@ -14,7 +14,8 @@ defmodule Elixir.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      mod: {WikiRecentChangesFeed, []},
+      #mod: {WikiRecentChangesFeed, []},
+      mod: {WikiSSE, []},
       extra_applications: [:logger]
     ]
   end
@@ -22,8 +23,10 @@ defmodule Elixir.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:eventsource_ex, "~> 0.0.2"},
       {:feeder, "~> 2.3.0"},
-      {:httpotion, "~> 3.1.0"}
+      {:httpotion, "~> 3.1.0"},
+      {:poison, "~> 4.0.1"}
     ]
   end
 end

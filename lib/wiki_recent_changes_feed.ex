@@ -1,6 +1,9 @@
 defmodule WikiRecentChangesFeed do
   @moduledoc """
-  Documentation for WikiRecentChangesFeed.
+  Wikipedia's built-in Recent Changes feed allows us to poll up to 50 recent
+  edits at a time.  This module applies a callback to each edit.  The default
+  callback is for demonstration, and will print a summary of each edit, one per
+  line.
   """
 
   @recent_changes_feed "https://en.wikipedia.org/w/api.php?hidebots=1&hidecategorization=1&hideWikibase=1&urlversion=1&days=7&limit=50&action=feedrecentchanges&feedformat=atom"
