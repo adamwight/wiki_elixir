@@ -7,27 +7,33 @@ defmodule Elixir.MixProject do
       version: "0.1.0",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
+      description: description(),
       deps: deps(),
-      package: package()
+      package: package(),
+      source_url: "https://github.com/adamwight/wiki_elixir",
+      docs: [
+        extras: ["README.md"]
+      ]
     ]
   end
 
   # Run "mix help compile.app" to learn about applications.
   def application do
-    [
-      #mod: {WikiRecentChangesFeed, []},
-      extra_applications: [:logger]
-    ]
+    []
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       {:eventsource_ex, "~> 0.0.2"},
-      {:ex_doc, "~> 0.19"},
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:feeder, "~> 2.3"},
       {:httpotion, "~> 3.1"}
     ]
+  end
+
+  defp description do
+    "Provides Elixir connectors to work with Wikipedia feeds."
   end
 
   defp package do

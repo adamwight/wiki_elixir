@@ -3,34 +3,37 @@ defmodule WikiSSE do
   This module reads from an infinite [server-sent events](https://en.wikipedia.org/wiki/Server-sent_events)
   stream with information about edits and other changes to all Wikimedia
   projects.
-  
+
   For more about the public wiki streams and their format, see
   [EventStreams on Wikitech](https://wikitech.wikimedia.org/wiki/EventStreams)
+  """
 
-  ## Application parameters
+  @sse_feed "https://stream.wikimedia.org/v2/stream/recentchange"
 
-  * endpoint: URL to the SSE feed
+  @doc """
+  Begin reading from the feed.
+
+  ## Parameters
+
   * event_callback: Callback taking one argument, the event message.
+  * endpoint: URL to the SSE feed
 
   ## Event callback
 
   The event callback should accept an EventsourceEx.Message.  It will be
   executed in its own linked task, so only raise an error if you intend to stop
-  the application.
+  the application.  message.data is a JSON-encoded payload.
   """
-
-  @sse_feed "https://stream.wikimedia.org/v2/stream/recentchange"
-
-  def start_link(event_callback) do
+  def start_link(event_callback, endpoint \\ @sse_feed) do
     # TODO: needs a supervisor
     watcher = Task.start_link(fn ->
       watch_feed(event_callback)
     end)
     # TODO: make the feed URL configurable
-    read_feed(@sse_feed, elem(watcher, 1))
+    read_feed(elem(watcher, 1), endpoint)
   end
 
-  defp read_feed(endpoint, watcher) do
+  defp read_feed(watcher, endpoint) do
     EventsourceEx.new(endpoint, stream_to: watcher)
   end
 
