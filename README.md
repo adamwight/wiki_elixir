@@ -1,7 +1,10 @@
 # Wiki Elixir
 
 This project provides Elixir connectors to work with Wikipedia (and other
-MediaWiki) data sources.  It supports realtime feed processing and (TODO) API calls.
+MediaWiki) data sources.  It supports realtime feed processing and (TODO)
+should be able to wrap API calls and continuations in the future.
+
+The `examples` directory shows how to use this library.
 
 ## Installation
 

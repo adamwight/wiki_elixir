@@ -3,11 +3,12 @@ defmodule Elixir.MixProject do
 
   def project do
     [
-      app: :wiki_tools,
+      app: :wiki_elixir,
       version: "0.1.0",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      package: package()
     ]
   end
 
@@ -15,7 +16,6 @@ defmodule Elixir.MixProject do
   def application do
     [
       #mod: {WikiRecentChangesFeed, []},
-      mod: {WikiSSE, []},
       extra_applications: [:logger]
     ]
   end
@@ -26,8 +26,16 @@ defmodule Elixir.MixProject do
       {:eventsource_ex, "~> 0.0.2"},
       {:ex_doc, "~> 0.19"},
       {:feeder, "~> 2.3"},
-      {:httpotion, "~> 3.1"},
-      {:poison, "~> 4.0"}
+      {:httpotion, "~> 3.1"}
+    ]
+  end
+
+  defp package do
+    [
+      name: :wiki_elixir,
+      maintainers: ["adamwight"],
+      licenses: ["GPLv3"],
+      links: %{"GitHub" => "https://github.com/adamwight/wiki_elixir"}
     ]
   end
 end
