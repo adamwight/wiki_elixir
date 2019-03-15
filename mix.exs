@@ -25,6 +25,7 @@ defmodule Elixir.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:dialyxir, "~> 1.0.0-rc.4", runtime: false},
       {:eventsource_ex, "~> 0.0.2"},
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:feeder, "~> 2.3"},

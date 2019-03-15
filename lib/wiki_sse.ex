@@ -1,8 +1,7 @@
 defmodule WikiSSE do
   @moduledoc """
-  This module reads from an infinite [server-sent events](https://en.wikipedia.org/wiki/Server-sent_events)
-  stream with information about edits and other changes to all Wikimedia
-  projects.
+  This module reads from an infinite stream of [server-sent events](https://en.wikipedia.org/wiki/Server-sent_events)
+  annotating actions such as editing or patrolling, as they happen on Wikimedia projects.
 
   For more about the public wiki streams and their format, see
   [EventStreams on Wikitech](https://wikitech.wikimedia.org/wiki/EventStreams)

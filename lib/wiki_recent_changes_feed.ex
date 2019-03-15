@@ -8,10 +8,9 @@ defmodule WikiRecentChangesFeed do
 
   @recent_changes_feed "https://en.wikipedia.org/w/api.php?hidebots=1&hidecategorization=1&hideWikibase=1&urlversion=1&days=7&limit=50&action=feedrecentchanges&feedformat=atom"
 
+  @spec start_link(fun, String.t) :: {:ok, pid()}
   def start_link(edit_callback, endpoint \\ @recent_changes_feed) do
-    Task.start_link(fn ->
-      parse_atom(edit_callback, endpoint)
-    end)
+    Task.start_link(__MODULE__, :parse_atom, [edit_callback, endpoint])
   end
 
   defp atom_response(endpoint) do
@@ -22,6 +21,7 @@ defmodule WikiRecentChangesFeed do
     atom_response(endpoint).body
   end
 
+  @spec parse_atom(fun, String.t) :: nil
   defp parse_atom(edit_callback, endpoint) do
     :feeder.stream atom_content(endpoint), initial_opts(edit_callback)
   end
