@@ -34,6 +34,7 @@ defmodule Elixir.MixProject do
       # Unfortunately, we have to follow eventsource_ex.  TODO: help them upgrade to httpoison 1.x
       {:httpoison, "~> 0.11"},
       {:mox, "~> 0.5", only: :test},
+      {:poison, "~> 4.0"},
       {:timex, "~> 3.5"}
     ]
   end

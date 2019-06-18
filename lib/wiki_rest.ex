@@ -1,57 +1,19 @@
 defmodule WikiRest do
   @moduledoc """
   Access the [Wikimedia REST API](https://www.mediawiki.org/wiki/REST_API)
+
+  ## TODO
+
+  * Lots of ideosyncracies about how data is delayed in the backend.  Tune
+  default time parameters to play nice with job update schedules.
+  * Ideally, individual API methods would return an URL rather than perform the
+  call, and would be transparently composed with an execute-and-unpack
+  function.
   """
 
   @wikimedia_org "https://wikimedia.org/api/rest_v1"
 
-  def pageviews_per_article(project, article) do
-    pageviews_per_article(project, "all-access", "all-agents", article, "daily", default_start_day(), today())
-  end
-
-  def pageviews_per_article(project, article, start, finish) do
-    pageviews_per_article(project, "all-access", "all-agents", article, "daily", start, finish)
-  end
-
-  def pageviews_per_article(project, access, agent, article, granularity, start, finish) do
-    "#{@wikimedia_org}/metrics/pageviews/per-article/#{project}/#{access}/#{agent}/#{article}/#{granularity}/#{start}/#{finish}"
-    |> get_body
-  end
-
-  def pageviews_aggregate(project) do
-    pageviews_aggregate(project, default_start_day(), today())
-  end
-
-  def pageviews_aggregate(project, start, finish) do
-    pageviews_aggregate(project, "all-access", "all-agents", "daily", start, finish)
-  end
-
-  def pageviews_aggregate(project, access, agent, granularity, start, finish) do
-    "#{@wikimedia_org}/metrics/pageviews/aggregate/#{project}/#{access}/#{agent}/#{granularity}/#{start}/#{finish}"
-    |> get_body
-  end
-
-  defp get_body(url) do
-    url
-    |> HTTPoison.get!
-    |> extract_body
-  end
-
-  defp extract_body(response) do
-    response.body
-  end
-
-  defp default_start_day() do
-    Timex.today
-    |> Timex.shift(days: -7)
-    |> daystamp
-  end
-
-  defp today() do
-    Timex.today |> daystamp
-  end
-
-  defp daystamp(datetime) do
-    datetime |> Timex.format!("{YYYY}{0M}{0D}")
-  end
+  use WikiRest.Edits
+  use WikiRest.Pageviews
+  use WikiRest.Util
 end
