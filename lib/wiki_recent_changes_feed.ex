@@ -14,7 +14,7 @@ defmodule WikiRecentChangesFeed do
   end
 
   defp atom_response(endpoint) do
-    HTTPotion.get endpoint
+    HTTPoison.get! endpoint
   end
 
   defp atom_content(endpoint) do

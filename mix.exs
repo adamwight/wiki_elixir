@@ -19,17 +19,22 @@ defmodule Elixir.MixProject do
 
   # Run "mix help compile.app" to learn about applications.
   def application do
-    []
+    [
+      applications: [:timex]
+    ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:dialyxir, "~> 1.0.0-rc.4", runtime: false},
+      {:dialyxir, "~> 1.0.0-rc.6", runtime: false},
       {:eventsource_ex, "~> 0.0.2"},
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:feeder, "~> 2.3"},
-      {:httpotion, "~> 3.1"}
+      # Unfortunately, we have to follow eventsource_ex.  TODO: help them upgrade to httpoison 1.x
+      {:httpoison, "~> 0.11.2"},
+      {:mox, "~> 0.5", only: :test},
+      {:timex, "~> 3.5"}
     ]
   end
 

@@ -14,6 +14,7 @@ defmodule TrendingEdits.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
+      # ??? applications: [:httpotion],
       mod: {TrendingEditsMain, []},
       extra_applications: [:logger]
     ]
