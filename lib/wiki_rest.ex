@@ -3,8 +3,10 @@ defmodule WikiRest do
   Access the [Wikimedia REST API](https://www.mediawiki.org/wiki/REST_API)
   """
 
+  @wikimedia_org "https://wikimedia.org/api/rest_v1"
+
   def pageviews_per_article(project, article) do
-    pageviews_per_article(project, "all-access", "all-agents", article, "daily", default_start_day, today)
+    pageviews_per_article(project, "all-access", "all-agents", article, "daily", default_start_day(), today())
   end
 
   def pageviews_per_article(project, article, start, finish) do
@@ -12,12 +14,12 @@ defmodule WikiRest do
   end
 
   def pageviews_per_article(project, access, agent, article, granularity, start, finish) do
-    "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/#{project}/#{access}/#{agent}/#{article}/#{granularity}/#{start}/#{finish}"
+    "#{@wikimedia_org}/metrics/pageviews/per-article/#{project}/#{access}/#{agent}/#{article}/#{granularity}/#{start}/#{finish}"
     |> get_body
   end
 
   def pageviews_aggregate(project) do
-    pageviews_aggregate(project, default_start_day, today)
+    pageviews_aggregate(project, default_start_day(), today())
   end
 
   def pageviews_aggregate(project, start, finish) do
@@ -25,13 +27,12 @@ defmodule WikiRest do
   end
 
   def pageviews_aggregate(project, access, agent, granularity, start, finish) do
-    "https://wikimedia.org/api/rest_v1/metrics/pageviews/aggregate/#{project}/#{access}/#{agent}/#{granularity}/#{start}/#{finish}"
+    "#{@wikimedia_org}/metrics/pageviews/aggregate/#{project}/#{access}/#{agent}/#{granularity}/#{start}/#{finish}"
     |> get_body
   end
 
   defp get_body(url) do
     url
-    |> IO.inspect
     |> HTTPoison.get!
     |> extract_body
   end

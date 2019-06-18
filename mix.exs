@@ -29,10 +29,10 @@ defmodule Elixir.MixProject do
     [
       {:dialyxir, "~> 1.0.0-rc.6", runtime: false},
       {:eventsource_ex, "~> 0.0.2"},
-      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.20", only: :dev, runtime: false},
       {:feeder, "~> 2.3"},
       # Unfortunately, we have to follow eventsource_ex.  TODO: help them upgrade to httpoison 1.x
-      {:httpoison, "~> 0.11.2"},
+      {:httpoison, "~> 0.11"},
       {:mox, "~> 0.5", only: :test},
       {:timex, "~> 3.5"}
     ]
