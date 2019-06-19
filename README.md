@@ -1,8 +1,9 @@
 # Wiki Elixir
 
 This project provides Elixir connectors to work with Wikipedia (and other
-MediaWiki) data sources.  It supports streaming recent changes processing and
-(TODO) should be able to wrap API calls and continuations in the future.
+MediaWiki) data sources.  It supports streaming recent changes processing, some of the
+[RESTBase API](https://www.mediawiki.org/wiki/REST_API), and (TODO) should wrap
+action API calls and continuations in the future.
 
 ## Installation
 
@@ -30,4 +31,3 @@ To contribute, please submit an issue or a pull request.
 
 Potential future directions:
 * Wrap the [MediaWiki action API](https://www.mediawiki.org/wiki/API:Main_page).
-* Wrap the [REST API](https://www.mediawiki.org/wiki/REST_API).
