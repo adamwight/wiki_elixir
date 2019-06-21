@@ -8,7 +8,8 @@ defmodule WikiRest do
   default time parameters to play nice with job update schedules.
   """
 
-  @wikimedia_org Application.get_env(:wiki_elixir, :wikimedia_org)
+  # FIXME: @wikimedia_org Application.get_env(:wiki_elixir, :wikimedia_org)
+  @wikimedia_org "https://wikimedia.org/api/rest_v1"
 
   use WikiRest.Citation
   use WikiRest.Edits

@@ -28,16 +28,24 @@ end
 defmodule TrendingEditsMain do
   def start(:normal, []) do
     WikiSSE.start_link(&receive_event/1)
+    # TODO: progress thread showing number of matches attempted and API requests
   end
 
   def receive_event(event) do
     event
     |> decode_message_data
     |> merge_pageviews
-    |> Stream.filter(&trending?/1)
-    |> Enum.to_list
-    |> summarize_line
-    |> IO.inspect
+    |> print_when_trending
+  end
+
+  def print_when_trending(event) do
+    # FIXME: `if` is a smell?
+    # FIXME: only report uniques
+    if trending?(event) do
+      event
+      |> summarize_line
+      |> IO.puts
+    end
   end
 
   def decode_message_data(message) do
@@ -46,11 +54,11 @@ defmodule TrendingEditsMain do
   end
 
   def merge_pageviews(data) do
-    # TODO: dynamic timestamps, configurable window
-    history = WikiRest.pageviews(data["server_name"], title_safe(data["title"]), "20190612", "20190617")
+    # TODO: configurable time window
+    history = WikiRest.pageviews_per_article(data["server_name"], title_safe(data["title"]))
     # TODO: strip REST cruft?
     case history do
-      %{:items => items} ->
+      %{"items" => items} ->
         Map.merge(data, %{pageviews: items})
       _ ->
         data
@@ -63,15 +71,24 @@ defmodule TrendingEditsMain do
   end
 
   def trending?(data) do
+    # TODO:
+    # * 2 or more editors
     case data do
       %{:pageviews => views} ->
-        views[-1]["views"] > 2 * views[0]["views"]
+        %{"views" => old_views} = hd(Enum.reverse(views))
+        %{"views" => new_views} = hd(views)
+        #~s(#{hd(views)[:views]} -> #{tl(views)[:views]} (#{tl(views)[:views] / hd(views)[:views] - 1.0}%\))
+        old_views * 2 < new_views && new_views > 1_000
       _ ->
         false
     end
   end
 
   def summarize_line(data) do
-    ~s(#{data[:title]}; views jumped #{data[:pageviews][0][:views]} -> #{data[:pageviews][-1][:views]})
+    # FIXME: DRY
+    %{:pageviews => views, "title" => title} = data
+    %{"views" => old_views} = hd(Enum.reverse(views))
+    %{"views" => new_views} = hd(views)
+    ~s(#{title}; views jumped #{old_views} -> #{new_views})
   end
 end
