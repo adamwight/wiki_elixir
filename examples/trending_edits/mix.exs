@@ -14,15 +14,16 @@ defmodule TrendingEdits.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      # ??? applications: [:httpotion],
       mod: {TrendingEditsMain, []},
       extra_applications: [:logger]
+      # ??? applications: [:httpotion],
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:ex_ncurses, "~> 0.3.1"},
       {:poison, "~> 4.0"},
       #{:wiki_elixir, "~> 0.1"}
       # To use the local code:
