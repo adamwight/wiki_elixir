@@ -30,6 +30,7 @@ defmodule TrendingEditsMain do
 
   def start_link(_opts) do
     Counters.init()
+    TrendStore.init()
     Ui.init()
     WikiSSE.start_link(&receive_event/1)
     # TODO: progress thread showing number of matches attempted and API requests
@@ -44,9 +45,6 @@ defmodule TrendingEditsMain do
     |> print_when_trending
 
     Counters.incrementApiCalls()
-    #Ui.paint()
-    # TODO: refresh every 1s
-    #Ui.refresh()
   end
 
   def print_when_trending(event) do
@@ -54,8 +52,7 @@ defmodule TrendingEditsMain do
     # FIXME: only report uniques
     if trending?(event) do
       event
-      |> summarize_line
-      |> IO.puts
+      |> store_trend
     end
   end
 
@@ -93,6 +90,14 @@ defmodule TrendingEditsMain do
       _ ->
         false
     end
+  end
+
+  def store_trend(data) do
+    # FIXME: DRY
+    %{:pageviews => views, "title" => title} = data
+    %{"views" => old_views} = hd(Enum.reverse(views))
+    %{"views" => new_views} = hd(views)
+    TrendStore.insertArticle(title, old_views, new_views)
   end
 
   def summarize_line(data) do
