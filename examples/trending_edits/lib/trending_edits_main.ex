@@ -26,10 +26,14 @@ defmodule TrendingEditsSupervisor do
 end
 
 defmodule TrendingEditsMain do
-  def start(:normal, []) do
+  use Agent
+
+  def start_link(_opts) do
     Ui.init()
     WikiSSE.start_link(&receive_event/1)
     # TODO: progress thread showing number of matches attempted and API requests
+
+    Agent.start_link(fn -> %{} end)
   end
 
   def receive_event(event) do
