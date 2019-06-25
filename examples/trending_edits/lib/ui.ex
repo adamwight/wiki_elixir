@@ -1,16 +1,19 @@
 defmodule Ui do
+  @refresh_interval 1_000
+
   def init() do
     ExNcurses.initscr()
 
-    :ets.new(:counters, [:named_table, :public])
-    :ets.insert_new(:counters, {"api_calls", 0})
+    :timer.apply_interval(@refresh_interval, Ui, :paint, [])
   end
 
-  def incrementApiCalls() do
+  # TODO: break up repaint by window
+  def paint() do
     ExNcurses.move(0, 0)
-    count = :ets.update_counter(:counters, "api_calls", 1)
-
+    count = Counters.getApiCalls()
     ExNcurses.printw("Total API calls: " <> Integer.to_string(count))
+
+    refresh()
   end
 
   def refresh() do

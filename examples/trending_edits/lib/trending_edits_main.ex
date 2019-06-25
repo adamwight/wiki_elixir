@@ -29,6 +29,7 @@ defmodule TrendingEditsMain do
   use Agent
 
   def start_link(_opts) do
+    Counters.init()
     Ui.init()
     WikiSSE.start_link(&receive_event/1)
     # TODO: progress thread showing number of matches attempted and API requests
@@ -42,8 +43,10 @@ defmodule TrendingEditsMain do
     |> merge_pageviews
     |> print_when_trending
 
-    Ui.incrementApiCalls()
-    Ui.refresh()
+    Counters.incrementApiCalls()
+    #Ui.paint()
+    # TODO: refresh every 1s
+    #Ui.refresh()
   end
 
   def print_when_trending(event) do
