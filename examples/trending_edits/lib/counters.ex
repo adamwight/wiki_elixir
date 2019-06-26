@@ -1,7 +1,11 @@
 defmodule Counters do
-  def init() do
+  use Agent
+
+  def start_link(_opts) do
     :ets.new(:counters, [:named_table, :public])
     :ets.insert_new(:counters, [api_calls: 0])
+
+    Agent.start_link(fn -> %{} end)
   end
 
   def incrementApiCalls() do

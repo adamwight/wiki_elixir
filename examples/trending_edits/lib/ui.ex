@@ -1,10 +1,14 @@
 defmodule Ui do
+  use Agent
+
   @refresh_interval 1_000
 
-  def init() do
+  def start_link(_opts) do
     ExNcurses.initscr()
 
     :timer.apply_interval(@refresh_interval, Ui, :paint, [])
+
+    Agent.start_link(fn -> %{} end)
   end
 
   # TODO: break up repaint by window

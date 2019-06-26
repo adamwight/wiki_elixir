@@ -18,7 +18,10 @@ defmodule TrendingEditsSupervisor do
   def init(:ok) do
     # TODO: LRU cache for recent articles
     children = [
-        TrendingEditsMain
+        Counters,
+        TrendingEditsMain,
+        TrendStore,
+        Ui,
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
@@ -29,9 +32,6 @@ defmodule TrendingEditsMain do
   use Agent
 
   def start_link(_opts) do
-    Counters.init()
-    TrendStore.init()
-    Ui.init()
     WikiSSE.start_link(&receive_event/1)
     # TODO: progress thread showing number of matches attempted and API requests
 
