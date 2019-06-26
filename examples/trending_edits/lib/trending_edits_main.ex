@@ -63,7 +63,7 @@ defmodule TrendingEditsMain do
 
   def merge_pageviews(data) do
     # TODO: configurable time window
-    history = WikiRest.pageviews_per_article(data["server_name"], title_safe(data["title"]))
+    history = WikiRest.Pageviews.pageviews_per_article(data["server_name"], title_safe(data["title"]))
     # TODO: strip REST cruft?
     case history do
       %{"items" => items} ->

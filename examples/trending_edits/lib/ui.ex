@@ -1,7 +1,7 @@
 defmodule Ui do
   use Agent
 
-  @refresh_interval 1_000
+  @refresh_interval Application.get_env(:trending_edits, :ui_refresh_interval)
 
   def start_link(_opts) do
     ExNcurses.initscr()
