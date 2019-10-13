@@ -6,7 +6,7 @@ defmodule WikiRecentChangesFeed do
 
   @recent_changes_feed "https://en.wikipedia.org/w/api.php?hidebots=1&hidecategorization=1&hideWikibase=1&urlversion=1&days=7&limit=50&action=feedrecentchanges&feedformat=atom"
 
-  @type RecentChange :: [...]
+  @type RecentChange :: map()
   @type EventSink :: (RecentChange -> none())
 
   @spec start_link(EventSink, String.t()) :: on_start()
@@ -50,13 +50,13 @@ defmodule WikiRecentChangesFeed do
 
   @spec event({:feed, :feeder.feed()}, {nil, [RecentChange, ...]}, EventSink) ::
           {:feeder.feed(), [RecentChange, ...]}
-  def event({:feed, feed}, {nil, entries}, _) do
+  defp event({:feed, feed}, {nil, entries}, _) do
     {feed, entries}
   end
 
   @spec event(:endFeed, {:feeder.feed(), [RecentChange, ...]}, any()) ::
           {:feeder.feed(), [RecentChange, ...]}
-  def event(:endFeed, {feed, entries}, _) do
+  defp event(:endFeed, {feed, entries}, _) do
     {feed, Enum.reverse(entries)}
   end
 end

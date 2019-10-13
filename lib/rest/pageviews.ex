@@ -23,6 +23,7 @@ defmodule WikiRest.Pageviews do
           String.t(),
           String.t(),
           String.t(),
+          String.t(),
           String.t()
         ) :: String.t()
   def pageviews_per_article(project, access, agent, article, granularity, start, finish) do
