@@ -1,6 +1,14 @@
 defmodule WikiRest.Pageviews do
   def pageviews_per_article(project, article) do
-    pageviews_per_article(project, "all-access", "all-agents", article, "daily", WikiRest.Util.default_start_day(), WikiRest.Util.today())
+    pageviews_per_article(
+      project,
+      "all-access",
+      "all-agents",
+      article,
+      "daily",
+      WikiRest.Util.default_start_day(),
+      WikiRest.Util.today()
+    )
   end
 
   def pageviews_per_article(project, article, start, finish) do
@@ -8,8 +16,10 @@ defmodule WikiRest.Pageviews do
   end
 
   def pageviews_per_article(project, access, agent, article, granularity, start, finish) do
-    "#{WikiRest.wikimedia_org}/metrics/pageviews/per-article/#{project}/#{access}/#{agent}/#{WikiRest.Util.normalize_title(article)}/#{granularity}/#{start}/#{finish}"
-    |> WikiRest.Util.get_body
+    "#{WikiRest.wikimedia_org()}/metrics/pageviews/per-article/#{project}/#{access}/#{agent}/#{
+      WikiRest.Util.normalize_title(article)
+    }/#{granularity}/#{start}/#{finish}"
+    |> WikiRest.Util.get_body()
   end
 
   def pageviews_aggregate(project) do
@@ -21,13 +31,21 @@ defmodule WikiRest.Pageviews do
   end
 
   def pageviews_aggregate(project, access, agent, granularity, start, finish) do
-    "#{WikiRest.wikimedia_org}/metrics/pageviews/aggregate/#{project}/#{access}/#{agent}/#{granularity}/#{start}/#{finish}"
-    |> WikiRest.Util.get_body
+    "#{WikiRest.wikimedia_org()}/metrics/pageviews/aggregate/#{project}/#{access}/#{agent}/#{
+      granularity
+    }/#{start}/#{finish}"
+    |> WikiRest.Util.get_body()
   end
 
   def pageviews_top(project) do
     today = Timex.today() |> Timex.shift(days: -1)
-    pageviews_top(project, Timex.format!(today, "{YYYY}"), Timex.format!(today, "{0M}"), Timex.format!(today, "{0D}"))
+
+    pageviews_top(
+      project,
+      Timex.format!(today, "{YYYY}"),
+      Timex.format!(today, "{0M}"),
+      Timex.format!(today, "{0D}")
+    )
   end
 
   def pageviews_top(project, year, month) do
@@ -39,13 +57,20 @@ defmodule WikiRest.Pageviews do
   end
 
   def pageviews_top(project, access, year, month, day) do
-    "#{WikiRest.wikimedia_org}/metrics/pageviews/top/#{project}/#{access}/#{year}/#{month}/#{day}"
-    |> WikiRest.Util.get_body
+    "#{WikiRest.wikimedia_org()}/metrics/pageviews/top/#{project}/#{access}/#{year}/#{month}/#{
+      day
+    }"
+    |> WikiRest.Util.get_body()
   end
 
   def pageviews_top_by_country(project) do
     today = Timex.today() |> Timex.shift(months: -1)
-    pageviews_top_by_country(project, Timex.format!(today, "{YYYY}"), Timex.format!(today, "{0M}"))
+
+    pageviews_top_by_country(
+      project,
+      Timex.format!(today, "{YYYY}"),
+      Timex.format!(today, "{0M}")
+    )
   end
 
   def pageviews_top_by_country(project, year, month) do
@@ -53,7 +78,9 @@ defmodule WikiRest.Pageviews do
   end
 
   def pageviews_top_by_country(project, access, year, month) do
-    "#{WikiRest.wikimedia_org}/metrics/pageviews/top-by-country/#{project}/#{access}/#{year}/#{month}"
-    |> WikiRest.Util.get_body
+    "#{WikiRest.wikimedia_org()}/metrics/pageviews/top-by-country/#{project}/#{access}/#{year}/#{
+      month
+    }"
+    |> WikiRest.Util.get_body()
   end
 end

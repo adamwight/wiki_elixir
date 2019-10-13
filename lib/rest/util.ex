@@ -5,23 +5,23 @@ defmodule WikiRest.Util do
 
   def get_body(url) do
     url
-    |> HTTPoison.get!
+    |> HTTPoison.get!()
     |> extract_body
   end
 
   defp extract_body(response) do
     response.body
-    |> Poison.decode!
+    |> Poison.decode!()
   end
 
   def default_start_day() do
-    Timex.today
+    Timex.today()
     |> Timex.shift(days: -7)
     |> daystamp
   end
 
   def today() do
-    Timex.today |> daystamp
+    Timex.today() |> daystamp
   end
 
   defp daystamp(datetime) do

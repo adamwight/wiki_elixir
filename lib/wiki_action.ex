@@ -6,8 +6,9 @@ defmodule WikiAction do
   def request(endpoint, params) do
     # FIXME: underride as defaults
     params = Map.put(params, :format, :json)
+
     build_query(endpoint, params)
-    |> HTTPoison.get!
+    |> HTTPoison.get!()
     |> extract_body
   end
 
@@ -17,6 +18,6 @@ defmodule WikiAction do
 
   defp extract_body(response) do
     response.body
-    |> Poison.decode!
+    |> Poison.decode!()
   end
 end

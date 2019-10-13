@@ -3,7 +3,7 @@
 use Mix.Config
 
 config :wiki_elixir,
-    wikimedia_org: "https://wikimedia.org/api/rest_v1"
+  wikimedia_org: "https://wikimedia.org/api/rest_v1"
 
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this

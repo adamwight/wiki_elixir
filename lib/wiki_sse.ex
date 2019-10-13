@@ -28,9 +28,11 @@ defmodule WikiSSE do
   @spec start_link(EventSink, String.t()) :: none()
   def start_link(event_callback, endpoint \\ @sse_feed) do
     # TODO: needs a supervisor
-    watcher = Task.start_link(fn ->
-      watch_feed(event_callback)
-    end)
+    watcher =
+      Task.start_link(fn ->
+        watch_feed(event_callback)
+      end)
+
     # TODO: make the feed URL configurable
     read_feed(elem(watcher, 1), endpoint)
   end
@@ -48,6 +50,7 @@ defmodule WikiSSE do
           event_callback.(message)
         end)
     end
+
     # XXX what's this about?
     watch_feed(event_callback)
   end
