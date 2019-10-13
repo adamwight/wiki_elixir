@@ -2,7 +2,7 @@ defmodule WikiRest.Edits do
   @spec edits_aggregate(String.t()) :: String.t()
   def edits_aggregate(project) do
     month_ago = Timex.today() |> Timex.shift(months: -1) |> WikiRest.Util.daystamp()
-    edits_aggregate(project, month_ago, today())
+    edits_aggregate(project, month_ago, WikiRest.Util.today())
   end
 
   @spec edits_aggregate(String.t(), String.t(), String.t()) :: String.t()

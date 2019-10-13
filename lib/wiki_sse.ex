@@ -42,7 +42,7 @@ defmodule WikiSSE do
     EventsourceEx.new(endpoint, stream_to: watcher)
   end
 
-  @spec watch_feed(EventSink)
+  @spec watch_feed(EventSink) :: none()
   defp watch_feed(event_callback) do
     receive do
       message ->
@@ -51,7 +51,6 @@ defmodule WikiSSE do
         end)
     end
 
-    # XXX what's this about?
     watch_feed(event_callback)
   end
 end
