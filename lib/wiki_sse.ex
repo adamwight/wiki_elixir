@@ -9,6 +9,8 @@ defmodule WikiSSE do
 
   @sse_feed "https://stream.wikimedia.org/v2/stream/recentchange"
 
+  @type EventSink :: (EventsourceEx.Message -> none())
+
   @doc """
   Begin reading from the feed.
 
@@ -23,6 +25,7 @@ defmodule WikiSSE do
   executed in its own linked task, so only raise an error if you intend to stop
   the application.  message.data is a JSON-encoded payload.
   """
+  @spec start_link(EventSink, String.t()) :: none()
   def start_link(event_callback, endpoint \\ @sse_feed) do
     # TODO: needs a supervisor
     watcher = Task.start_link(fn ->
@@ -32,10 +35,12 @@ defmodule WikiSSE do
     read_feed(elem(watcher, 1), endpoint)
   end
 
+  @spec read_feed(on_start(), String.t()) :: on_start()
   defp read_feed(watcher, endpoint) do
     EventsourceEx.new(endpoint, stream_to: watcher)
   end
 
+  @spec watch_feed(EventSink)
   defp watch_feed(event_callback) do
     receive do
       message ->
@@ -43,6 +48,7 @@ defmodule WikiSSE do
           event_callback.(message)
         end)
     end
+    # XXX what's this about?
     watch_feed(event_callback)
   end
 end
