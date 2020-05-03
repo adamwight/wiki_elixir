@@ -23,8 +23,9 @@ defmodule EchoSSE.MixProject do
   defp deps do
     [
       {:poison, "~> 4.0"},
+      # In a real application, use the library directly,
       {:wiki_elixir, "~> 0.1"}
-      # To use the local code:
+      # But here we use the local code:
       #{:wiki_elixir, path: "../../"}
     ]
   end
