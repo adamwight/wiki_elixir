@@ -6,10 +6,10 @@ defmodule WikiRecentChangesFeed do
 
   @recent_changes_feed "https://en.wikipedia.org/w/api.php?hidebots=1&hidecategorization=1&hideWikibase=1&urlversion=1&days=7&limit=50&action=feedrecentchanges&feedformat=atom"
 
-  @type RecentChange :: map()
-  @type EventSink :: (RecentChange -> none())
+  @type recent_change :: map()
+  @type change_event_sink :: (recent_change -> none())
 
-  @spec start_link(EventSink, String.t()) :: on_start()
+  @spec start_link(change_event_sink, String.t()) :: {:ok, pid()}
   def start_link(edit_callback, endpoint \\ @recent_changes_feed) do
     Task.start_link(__MODULE__, :parse_atom, [edit_callback, endpoint])
   end
@@ -24,12 +24,12 @@ defmodule WikiRecentChangesFeed do
     atom_response(endpoint).body
   end
 
-  @spec parse_atom(EventSink, String.t()) :: nil
+  @spec parse_atom(change_event_sink, String.t()) :: nil
   defp parse_atom(edit_callback, endpoint) do
     :feeder.stream(atom_content(endpoint), initial_opts(edit_callback))
   end
 
-  @spec initial_opts(EventSink) :: [...]
+  @spec initial_opts(change_event_sink) :: [...]
   defp initial_opts(edit_callback) do
     [
       event_state: {nil, []},
@@ -37,8 +37,8 @@ defmodule WikiRecentChangesFeed do
     ]
   end
 
-  @spec event({:entry, RecentChange}, {:feeder.feed(), [RecentChange, ...]}, EventSink) ::
-          {:feeder.feed(), [RecentChange, ...]}
+  @spec event({:entry, recent_change}, {:feeder.feed(), [recent_change, ...]}, change_event_sink) ::
+          {:feeder.feed(), [recent_change, ...]}
   defp event({:entry, entry}, {feed, entries}, edit_callback) do
     Task.start_link(fn ->
       edit_callback.(entry)
@@ -48,14 +48,14 @@ defmodule WikiRecentChangesFeed do
     {feed, [entry] ++ entries}
   end
 
-  @spec event({:feed, :feeder.feed()}, {nil, [RecentChange, ...]}, EventSink) ::
-          {:feeder.feed(), [RecentChange, ...]}
+  @spec event({:feed, :feeder.feed()}, {nil, [recent_change, ...]}, change_event_sink) ::
+          {:feeder.feed(), [recent_change, ...]}
   defp event({:feed, feed}, {nil, entries}, _) do
     {feed, entries}
   end
 
-  @spec event(:endFeed, {:feeder.feed(), [RecentChange, ...]}, any()) ::
-          {:feeder.feed(), [RecentChange, ...]}
+  @spec event(:endFeed, {:feeder.feed(), [recent_change, ...]}, any()) ::
+          {:feeder.feed(), [recent_change, ...]}
   defp event(:endFeed, {feed, entries}, _) do
     {feed, Enum.reverse(entries)}
   end
