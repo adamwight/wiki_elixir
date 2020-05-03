@@ -9,7 +9,7 @@ defmodule WikiSSE do
 
   @sse_feed "https://stream.wikimedia.org/v2/stream/recentchange"
 
-  @type message_sink :: (EventsourceEx.Message.t -> none())
+  @type message_sink :: (EventsourceEx.Message.t() -> none())
 
   @doc """
   Begin reading from the feed.
@@ -42,7 +42,7 @@ defmodule WikiSSE do
     EventsourceEx.new(endpoint, headers: [], stream_to: watcher)
   end
 
-  @spec watch_feed(message_sink) :: none()
+  @spec watch_feed(message_sink) :: no_return()
   defp watch_feed(event_callback) do
     receive do
       message ->
