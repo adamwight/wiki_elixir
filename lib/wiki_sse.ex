@@ -39,7 +39,7 @@ defmodule WikiSSE do
 
   @spec read_feed(pid(), String.t()) :: {:ok, pid()}
   defp read_feed(watcher, endpoint) do
-    EventsourceEx.new(endpoint, stream_to: watcher)
+    EventsourceEx.new(endpoint, headers: [], stream_to: watcher)
   end
 
   @spec watch_feed(message_sink) :: none()

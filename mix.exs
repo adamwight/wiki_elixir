@@ -28,11 +28,10 @@ defmodule Elixir.MixProject do
   defp deps do
     [
       {:dialyxir, "~> 1.0.0-rc.6", runtime: false},
-      {:eventsource_ex, "~> 0.0.2"},
+      {:eventsource_ex, git: "https://github.com/cwc/eventsource_ex.git"},
       {:ex_doc, "~> 0.20", only: :dev, runtime: false},
       {:feeder, "~> 2.3"},
-      # Unfortunately, we have to follow eventsource_ex.  TODO: help them upgrade to httpoison 1.x
-      {:httpoison, "~> 0.11"},
+      {:httpoison, "~> 1.5"},
       {:mox, "~> 0.5", only: :test},
       {:poison, "~> 4.0"},
       {:timex, "~> 3.5"}
