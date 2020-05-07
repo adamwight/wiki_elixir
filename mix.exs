@@ -4,7 +4,7 @@ defmodule Elixir.MixProject do
   def project do
     [
       app: :wiki_elixir,
-      version: "0.1.0",
+      version: "0.1.1",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       description: description(),
@@ -27,10 +27,11 @@ defmodule Elixir.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:dialyxir, "~> 1.0.0-rc.6", runtime: false},
+      {:dialyxir, "~> 1.0.0", runtime: false},
       {:eventsource_ex, git: "https://github.com/cwc/eventsource_ex.git"},
       {:ex_doc, "~> 0.20", only: :dev, runtime: false},
       {:feeder, "~> 2.3"},
+      {:gen_stage, "~> 0.14"},
       {:httpoison, "~> 1.5"},
       {:mox, "~> 0.5", only: :test},
       {:poison, "~> 4.0"},

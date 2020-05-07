@@ -6,51 +6,36 @@ defmodule WikiSSE do
   For more about the public wiki streams and their format, see
   [EventStreams on Wikitech](https://wikitech.wikimedia.org/wiki/EventStreams)
   """
+  use GenStage
 
-  @sse_feed "https://stream.wikimedia.org/v2/stream/recentchange"
+  def start_link(endpoint \\ default_endpoint()) do
+    # FIXME: run under a supervisor tree
+    # TODO: extract this specific line, the rest is an adapter between raw received -> queue -> genstage producer.
+    EventsourceEx.new(endpoint, headers: [])
 
-  @type message_sink :: (EventsourceEx.Message.t() -> none())
-
-  @doc """
-  Begin reading from the feed.
-
-  ## Parameters
-
-  * event_callback: Callback taking one argument, the event message.
-  * endpoint: URL to the SSE feed
-
-  ## Event callback
-
-  The event callback should accept an EventsourceEx.Message.  It will be
-  executed in its own linked task, so only raise an error if you intend to stop
-  the application.  message.data is a JSON-encoded payload.
-  """
-  @spec start_link(message_sink, String.t()) :: {:ok, pid()}
-  def start_link(event_callback, endpoint \\ @sse_feed) do
-    # TODO: needs a supervisor
-    {:ok, watcher} =
-      Task.start_link(fn ->
-        watch_feed(event_callback)
-      end)
-
-    # TODO: make the feed URL configurable
-    read_feed(watcher, endpoint)
+    GenStage.start_link(__MODULE__, [])
   end
 
-  @spec read_feed(pid(), String.t()) :: {:ok, pid()}
-  defp read_feed(watcher, endpoint) do
-    EventsourceEx.new(endpoint, headers: [], stream_to: watcher)
+  def init([]) do
+    queue = :queue.new()
+    {:producer, queue}
   end
 
-  @spec watch_feed(message_sink) :: no_return()
-  defp watch_feed(event_callback) do
-    receive do
-      message ->
-        Task.start_link(fn ->
-          event_callback.(message)
-        end)
-    end
+  @spec handle_info(map(), queue())
+  def handle_info(message, queue) do
+    queue1 = :queue.in(message, queue)
+    {:noreply, queue1}
+  end
 
-    watch_feed(event_callback)
+  @spec handle_demand(integer(), queue())
+  def handle_demand(demand, queue) do
+    demand1 = min(demand, :queue.len(queue))
+    {retrieved, queue1} = :queue.split(demand1, queue)
+    retrieved1 = retrieved |> :queue.reverse |> :queue.to_list
+    {:noreply, retrieved1, queue1}
+  end
+
+  defp default_endpoint() do
+    Application.get_env(:wiki_elixir, :sse_feed)
   end
 end

@@ -1,25 +1,37 @@
-# mix run ./examples/echo_sse.ex
+# mix run ./examples/echo_sse.exs
 
 defmodule Source do
-  def start_link() do
+  use GenServer
+
+  def start_link([]) do
     WikiSSE.start_link()
+  end
+
+  def init(:ok) do
+    {:ok, []}
+  end
+
+  def handle_info(message, state) do
+    IO.puts(message)
+    {:noreply, state}
   end
 end
 
 defmodule Consumer do
   use ConsumerSupervisor
 
-  def start_link() do
-    ConsumerSupervisor.start_link(__MODULE__, :ok)
+  def start_link(args) do
+    ConsumerSupervisor.start_link(__MODULE__, args)
   end
 
-  def init(:ok) do
-    ConsumerSupervisor.init([Echo], strategy: :one_for_one, subscribe_to: [Source])
+  def init([]) do
+    opts = [strategy: :one_for_one, subscribe_to: [{Source, max_demand: 50}]]
+    ConsumerSupervisor.init([Echo], opts)
   end
 end
 
 defmodule Echo do
-  use GenServer
+  use GenServer, restart: :transient
 
   def start_link(message) do
     Task.start_link(fn ->
@@ -29,14 +41,6 @@ defmodule Echo do
 
   def init(message) do
     {:ok, message}
-  end
-
-  def child_spec(message) do
-    %{
-      id: __MODULE__,
-      restart: :transient,
-      start: {__MODULE__, :start_link, [message]}
-    }
   end
 end
 
@@ -72,14 +76,8 @@ end
 defmodule App do
   def start do
     children = [
-      %{
-        id: Source,
-        start: {Source, :start_link, []}
-      },
-      %{
-        id: Consumer,
-        start: {Consumer, :start_link, []}
-      }
+      #Consumer,
+      Source,
     ]
 
     {:ok, _} = Supervisor.start_link(children, strategy: :one_for_one)
