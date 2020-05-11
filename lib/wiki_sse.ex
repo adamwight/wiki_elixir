@@ -34,7 +34,7 @@ defmodule WikiSSE do
     def handle_demand(demand, queue) when demand > 0 do
       demand1 = min(demand, :queue.len(queue))
       {retrieved, queue1} = :queue.split(demand1, queue)
-      retrieved1 = retrieved |> :queue.reverse |> :queue.to_list
+      retrieved1 = retrieved |> :queue.reverse() |> :queue.to_list()
       {:noreply, retrieved1, queue1}
     end
   end
@@ -44,7 +44,7 @@ defmodule WikiSSE do
       %{
         id: Source,
         # FIXME: nicer if we could get the Relay sibling's specific PID each time, to allow an app to use multiple stream listeners.
-        start: {EventsourceEx, :new, [endpoint, [headers: [], stream_to: Relay]]},
+        start: {EventsourceEx, :new, [endpoint, [headers: [], stream_to: Relay]]}
       }
     end
   end
@@ -59,10 +59,12 @@ defmodule WikiSSE do
     def start_link(args) do
       endpoint = args[:endpoint] || default_endpoint()
       sink = args[:send_to] || self()
+
       children = [
         {Relay, sink},
-        {Source, endpoint},
+        {Source, endpoint}
       ]
+
       {:ok, _} = Supervisor.start_link(children, strategy: :one_for_one)
     end
 
