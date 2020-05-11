@@ -10,12 +10,10 @@ defmodule WikiSSE do
   * Track the restart ID
   * Expose the restart ID?
   * Use the restart ID internally and reconnect from that point.
-  * Application-lifetime or permanent storage for message queue, for consumers that need an at-least-once guarantee.
-  * Run EventsourceEx under a Supervisor.
+  * Application-lifetime or permanent storage for message queue, or restart ID tracking, for consumers that need an at-least-once guarantee.
   """
 
   defmodule Relay do
-    # XXX: gen_stage or directly relay with a gen_server?, stage seems to require more of the consumer.
     use GenStage
 
     def start_link(args) do
