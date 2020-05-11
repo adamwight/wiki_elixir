@@ -33,7 +33,7 @@ defmodule WikiSSE do
     end
 
     @spec handle_demand(integer(), :queue.queue()) :: {:noreply, list(), :queue.queue()}
-    def handle_demand(demand, queue) do
+    def handle_demand(demand, queue) when demand > 0 do
       demand1 = min(demand, :queue.len(queue))
       {retrieved, queue1} = :queue.split(demand1, queue)
       retrieved1 = retrieved |> :queue.reverse |> :queue.to_list

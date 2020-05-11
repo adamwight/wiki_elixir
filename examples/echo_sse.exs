@@ -1,32 +1,5 @@
 # mix run ./examples/echo_sse.exs
 
-defmodule Consumer do
-  use ConsumerSupervisor
-
-  def start_link(args) do
-    ConsumerSupervisor.start_link(__MODULE__, args)
-  end
-
-  def init([]) do
-    opts = [strategy: :one_for_one, subscribe_to: [{WikiSSE.Relay, max_demand: 50}]]
-    ConsumerSupervisor.init([Echo], opts)
-  end
-end
-
-defmodule Echo do
-  use GenServer, restart: :transient
-
-  def start_link(message) do
-    Task.start_link(fn ->
-      DebugMessage.echo_event(message)
-    end)
-  end
-
-  def init(message) do
-    {:ok, message}
-  end
-end
-
 defmodule DebugMessage do
   def echo_event(message) do
     message
@@ -56,16 +29,8 @@ defmodule DebugMessage do
   end
 end
 
-defmodule App do
-  def start do
-    children = [
-      Consumer,
-      WikiSSE.RelaySupervisor,
-    ]
+WikiSSE.RelaySupervisor.start_link([])
 
-    {:ok, _} = Supervisor.start_link(children, strategy: :one_for_one)
-  end
-end
-
-App.start()
-Process.sleep(:infinity)
+GenStage.stream([WikiSSE.Relay])
+  |> Stream.map(fn message -> DebugMessage.echo_event(message) end)
+  |> Stream.run()
