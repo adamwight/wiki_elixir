@@ -24,7 +24,7 @@ defmodule WikiSSE do
       {:producer, :queue.new()}
     end
 
-    @spec handle_info(map(), :queue.queue()) :: {:noreply, :queue.queue()}
+    @spec handle_info(map(), :queue.queue()) :: {:noreply, [], :queue.queue()}
     def handle_info(message, queue) do
       queue1 = :queue.in(message, queue)
       {:noreply, [], queue1}
