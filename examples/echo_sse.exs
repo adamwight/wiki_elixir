@@ -1,22 +1,5 @@
 # mix run ./examples/echo_sse.exs
 
-defmodule Source do
-  use GenServer
-
-  def start_link([]) do
-    WikiSSE.start_link()
-  end
-
-  def init(:ok) do
-    {:ok, []}
-  end
-
-  def handle_info(message, state) do
-    IO.puts(message)
-    {:noreply, state}
-  end
-end
-
 defmodule Consumer do
   use ConsumerSupervisor
 
@@ -25,7 +8,7 @@ defmodule Consumer do
   end
 
   def init([]) do
-    opts = [strategy: :one_for_one, subscribe_to: [{Source, max_demand: 50}]]
+    opts = [strategy: :one_for_one, subscribe_to: [{WikiSSE.Relay, max_demand: 50}]]
     ConsumerSupervisor.init([Echo], opts)
   end
 end
@@ -76,8 +59,8 @@ end
 defmodule App do
   def start do
     children = [
-      #Consumer,
-      Source,
+      Consumer,
+      WikiSSE.RelaySupervisor,
     ]
 
     {:ok, _} = Supervisor.start_link(children, strategy: :one_for_one)
