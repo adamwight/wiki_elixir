@@ -13,19 +13,24 @@ defmodule DebugMessage do
     |> Poison.decode!
   end
 
+  defp summarize_event(%{"type" => "categorize"} = data) do
+    ~s(#{data["meta"]["dt"]}: #{data["wiki"]} #{data["title"]} #{data["comment"]} as #{data["title"]} by #{data["user"]})
+  end
+
+  defp summarize_event(%{"type" => "edit"} = data) do
+    ~s(#{data["meta"]["dt"]}: #{data["wiki"]} #{data["title"]} edited by #{data["user"]})
+  end
+
+  defp summarize_event(%{"type" => "log"} = data) do
+    ~s(#{data["meta"]["dt"]}: #{data["wiki"]} #{data["title"]} #{data["log_action"]} by #{data["user"]})
+  end
+
+  defp summarize_event(%{"type" => "new"} = data) do
+    ~s(#{data["meta"]["dt"]}: #{data["wiki"]} #{data["title"]} created by #{data["user"]})
+  end
+
   defp summarize_event(data) do
-    case data["type"] do
-      "categorize" ->
-        ~s(#{data["meta"]["dt"]}: #{data["wiki"]} #{data["title"]} #{data["comment"]} as #{data["title"]} by #{data["user"]})
-      "edit" ->
-        ~s(#{data["meta"]["dt"]}: #{data["wiki"]} #{data["title"]} edited by #{data["user"]})
-      "log" ->
-        ~s(#{data["meta"]["dt"]}: #{data["wiki"]} #{data["title"]} #{data["log_action"]} by #{data["user"]})
-      "new" ->
-        ~s(#{data["meta"]["dt"]}: #{data["wiki"]} #{data["title"]} created by #{data["user"]})
-      _ ->
-        ~s(#{data["meta"]["dt"]}: #{data["type"]} event: #{Poison.encode!(data)})
-    end
+    ~s(#{data["meta"]["dt"]}: #{data["type"]} event: #{Poison.encode!(data)})
   end
 end
 
