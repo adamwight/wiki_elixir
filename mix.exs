@@ -10,7 +10,7 @@ defmodule Elixir.MixProject do
       description: description(),
       deps: deps(),
       package: package(),
-      source_url: "https://github.com/adamwight/wiki_elixir",
+      source_url: "https://gitlab.com/adamwight/wiki_elixir",
       docs: [
         extras: ["README.md"]
       ]
