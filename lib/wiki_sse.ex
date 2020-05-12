@@ -6,7 +6,15 @@ defmodule WikiSSE do
   For more about the public wiki streams and their format, see
   [EventStreams on Wikitech](https://wikitech.wikimedia.org/wiki/EventStreams)
 
-  TODO:
+  ## Examples
+
+  Start reading the default feed, and expose as a GenStage.stream:
+
+    WikiSSE.start_link()
+    WikiSSE.stream() |> Stream.take(6) |> Enum.to_list |> IO.inspect
+
+  ## TODO
+
   * Track the restart ID, disconnect from the feed at some maximum queue size.  Reconnect as demand resumes.
   Application-lifetime or permanent storage for the restart ID tracking, for consumers that need an at-least-once
   guarantee.
@@ -17,6 +25,8 @@ defmodule WikiSSE do
 
     @type state :: {:queue.queue(), integer}
 
+    @type reply :: {:noreply, [map()], state()}
+
     def start_link(args) do
       GenStage.start_link(__MODULE__, args, name: __MODULE__)
     end
@@ -25,12 +35,15 @@ defmodule WikiSSE do
       {:producer, {:queue.new(), 0}}
     end
 
+    @spec handle_info(EventsourceEx.Message.t(), state()) :: reply()
     def handle_info(message, {queue, pending_demand}) do
-      queue1 = :queue.in(message, queue)
+      event = decode_message_data(message)
+      queue1 = :queue.in(event, queue)
       # FIXME: Suppress reply until above min_demand or periodic timeout has elapsed.
       dispatch_events(queue1, pending_demand)
     end
 
+    @spec handle_demand(integer(), state()) :: reply()
     def handle_demand(demand, {queue, pending_demand}) do
       dispatch_events(queue, demand + pending_demand)
     end
@@ -40,6 +53,12 @@ defmodule WikiSSE do
       {retrieved, queue1} = :queue.split(available, queue)
       events = :queue.to_list(retrieved) |> Enum.reverse()
       {:noreply, events, {queue1, demand - available}}
+    end
+
+    @spec decode_message_data(EventsourceEx.Message.t()) :: map()
+    defp decode_message_data(message) do
+      message.data
+      |> Poison.decode!
     end
   end
 
@@ -81,7 +100,7 @@ defmodule WikiSSE do
   @type options :: [option]
 
   @type option ::
-          {:endpoint, string}
+          {:endpoint, String.t()}
           | {:send_to, GenServer.server()}
 
   @spec start_link(options) :: GenServer.on_start()

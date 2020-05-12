@@ -1,16 +1,11 @@
 # mix run ./examples/echo_sse.exs
 
 defmodule DebugMessage do
+  @spec echo_event(map()) :: String.t()
   def echo_event(message) do
     message
-      |> decode_message_data
       |> event_line
       |> IO.puts
-  end
-
-  defp decode_message_data(message) do
-    message.data
-      |> Poison.decode!
   end
 
   defp event_line(data) do
