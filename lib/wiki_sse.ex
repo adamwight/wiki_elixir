@@ -7,35 +7,39 @@ defmodule WikiSSE do
   [EventStreams on Wikitech](https://wikitech.wikimedia.org/wiki/EventStreams)
 
   TODO:
-  * Track the restart ID
-  * Expose the restart ID?
-  * Use the restart ID internally and reconnect from that point.
-  * Application-lifetime or permanent storage for message queue, or restart ID tracking, for consumers that need an at-least-once guarantee.
+  * Track the restart ID, disconnect from the feed at some maximum queue size.  Reconnect as demand resumes.
+  Application-lifetime or permanent storage for the restart ID tracking, for consumers that need an at-least-once
+  guarantee.
   """
 
   defmodule Relay do
     use GenStage
+
+    @type state :: {:queue.queue(), integer}
 
     def start_link(args) do
       GenStage.start_link(__MODULE__, args, name: __MODULE__)
     end
 
     def init(_) do
-      {:producer, :queue.new()}
+      {:producer, {:queue.new(), 0}}
     end
 
-    @spec handle_info(map(), :queue.queue()) :: {:noreply, [], :queue.queue()}
-    def handle_info(message, queue) do
+    def handle_info(message, {queue, pending_demand}) do
       queue1 = :queue.in(message, queue)
-      {:noreply, [], queue1}
+      # FIXME: Suppress reply until above min_demand
+      dispatch_events(queue1, pending_demand)
     end
 
-    @spec handle_demand(integer(), :queue.queue()) :: {:noreply, list(), :queue.queue()}
-    def handle_demand(demand, queue) when demand > 0 do
-      demand1 = min(demand, :queue.len(queue))
-      {retrieved, queue1} = :queue.split(demand1, queue)
-      retrieved1 = retrieved |> :queue.reverse() |> :queue.to_list()
-      {:noreply, retrieved1, queue1}
+    def handle_demand(demand, {queue, pending_demand}) do
+      dispatch_events(queue, demand + pending_demand)
+    end
+
+    defp dispatch_events(queue, demand) do
+      available = min(demand, :queue.len(queue))
+      {retrieved, queue1} = :queue.split(available, queue)
+      events = :queue.to_list(retrieved) |> Enum.reverse()
+      {:noreply, events, {queue1, demand - available}}
     end
   end
 
