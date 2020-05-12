@@ -27,7 +27,7 @@ defmodule WikiSSE do
 
     def handle_info(message, {queue, pending_demand}) do
       queue1 = :queue.in(message, queue)
-      # FIXME: Suppress reply until above min_demand
+      # FIXME: Suppress reply until above min_demand or periodic timeout has elapsed.
       dispatch_events(queue1, pending_demand)
     end
 
