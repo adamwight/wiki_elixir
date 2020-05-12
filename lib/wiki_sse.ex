@@ -15,7 +15,7 @@ defmodule WikiSSE do
   defmodule Relay do
     use GenStage
 
-    @type state :: {:queue.queue, integer}
+    @type state :: {:queue.queue(), integer}
 
     def start_link(args) do
       GenStage.start_link(__MODULE__, args, name: __MODULE__)
@@ -82,14 +82,14 @@ defmodule WikiSSE do
 
   @type option ::
           {:endpoint, string}
-          | {:send_to, GenServer.server}
+          | {:send_to, GenServer.server()}
 
-  @spec start_link(options) :: GenServer.on_start
+  @spec start_link(options) :: GenServer.on_start()
   def start_link(args \\ []) do
     RelaySupervisor.start_link(args)
   end
 
-  @spec stream(keyword) :: Enumerable.t
+  @spec stream(keyword) :: Enumerable.t()
   def stream(options \\ []) do
     GenStage.stream([Relay], options)
   end
