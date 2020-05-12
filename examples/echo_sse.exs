@@ -9,9 +9,8 @@ defmodule DebugMessage do
   end
 
   defp event_line(data) do
-    data["meta"]["dt"] <> ": "
-      <> IO.ANSI.green() <> data["wiki"] <> IO.ANSI.reset() <> " "
-      <> summarize_event(data)
+    [data["meta"]["dt"], ": ", :green, data["wiki"], :reset, " ", summarize_event(data)]
+      |> IO.ANSI.format()
   end
 
   defp summarize_event(%{"type" => "categorize"} = data) do
