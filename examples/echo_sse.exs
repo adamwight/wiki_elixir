@@ -9,23 +9,25 @@ defmodule DebugMessage do
   end
 
   defp event_line(data) do
-    data["meta"]["dt"] <> ": " <> summarize_event(data)
+    data["meta"]["dt"] <> ": "
+      <> IO.ANSI.green() <> data["wiki"] <> IO.ANSI.reset() <> " "
+      <> summarize_event(data)
   end
 
   defp summarize_event(%{"type" => "categorize"} = data) do
-    ~s(#{data["wiki"]} #{data["title"]} #{data["comment"]} as #{data["title"]} by #{data["user"]})
+    ~s(#{data["title"]} #{data["comment"]} as #{data["title"]} by #{data["user"]})
   end
 
   defp summarize_event(%{"type" => "edit"} = data) do
-    ~s(#{data["wiki"]} #{data["title"]} edited by #{data["user"]})
+    ~s(#{data["title"]} edited by #{data["user"]})
   end
 
   defp summarize_event(%{"type" => "log"} = data) do
-    ~s(#{data["wiki"]} #{data["title"]} #{data["log_action"]} by #{data["user"]})
+    ~s(#{data["title"]} #{data["log_action"]} by #{data["user"]})
   end
 
   defp summarize_event(%{"type" => "new"} = data) do
-    ~s(#{data["wiki"]} #{data["title"]} created by #{data["user"]})
+    ~s(#{data["title"]} created by #{data["user"]})
   end
 
   defp summarize_event(data) do
