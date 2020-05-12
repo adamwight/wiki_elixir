@@ -38,8 +38,7 @@ defmodule DebugMessage do
   end
 end
 
-WikiSSE.RelaySupervisor.start_link([])
-
-GenStage.stream([WikiSSE.Relay])
+WikiSSE.start_link()
+WikiSSE.stream()
   |> Stream.map(fn message -> DebugMessage.echo_event(message) end)
   |> Stream.run()
