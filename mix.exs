@@ -20,7 +20,10 @@ defmodule Elixir.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      applications: [:timex]
+      applications: [
+        :mojito,
+        :timex,
+      ]
     ]
   end
 
@@ -33,6 +36,8 @@ defmodule Elixir.MixProject do
       {:feeder, "~> 2.3"},
       {:gen_stage, "~> 0.14"},
       {:httpoison, "~> 1.5"},
+      {:jason, "~> 1.2"},
+      {:mojito, "~> 0.6"},
       {:mox, "~> 0.5", only: :test},
       {:poison, "~> 4.0"},
       {:timex, "~> 3.5"}

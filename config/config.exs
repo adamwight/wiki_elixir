@@ -4,7 +4,11 @@ use Mix.Config
 
 config :wiki_elixir,
   wikimedia_org: "https://wikimedia.org/api/rest_v1",
-  sse_feed: "https://stream.wikimedia.org/v2/stream/recentchange"
+  sse_feed: "https://stream.wikimedia.org/v2/stream/recentchange",
+
+  action_api: "https://test.wikipedia.org/w/api.php",
+  username: "<user>",
+  password: "<pass>"
 
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this
