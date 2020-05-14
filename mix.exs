@@ -29,15 +29,14 @@ defmodule Elixir.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:dialyxir, "~> 1.0.0", runtime: false},
+      {:dialyxir, "~> 1.0", runtime: false},
       {:eventsource_ex, git: "https://github.com/cwc/eventsource_ex.git"},
-      {:ex_doc, "~> 0.20", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.22", only: :dev, runtime: false},
       {:feeder, "~> 2.3"},
-      {:gen_stage, "~> 0.14"},
-      {:httpoison, "~> 1.5"},
+      {:gen_stage, "~> 1.0"},
+      {:httpoison, "~> 1.6"},
       {:jason, "~> 1.2"},
-      {:mox, "~> 0.5", only: :test},
-      {:timex, "~> 3.5"}
+      {:timex, "~> 3.6"}
     ]
   end
 
