@@ -23,7 +23,7 @@ defmodule WikiAction do
             {:halt, nil}
         end
       end,
-      fn _ -> end
+      fn _ -> nil end
     )
   end
 
