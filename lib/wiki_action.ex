@@ -14,9 +14,7 @@ defmodule WikiAction do
       fn prev ->
         case prev do
           %{"continue" => continue} ->
-            next = get(
-              Map.merge(params, continue)
-            )
+            next = get(Map.merge(params, continue))
             {[next], next}
 
           _ ->
@@ -32,10 +30,11 @@ defmodule WikiAction do
     # FIXME: support a base URL with prepended parameters, see HTTPoison.Base.build_query_params
     url = @endpoint <> "?" <> URI.encode_query(params)
     {:ok, response} = HTTPoison.get(url, headers())
+
     case params do
       %{"format" => "json"} ->
         response.body
-          |> Jason.decode!
+        |> Jason.decode!()
 
       _ ->
         response.body
@@ -44,7 +43,7 @@ defmodule WikiAction do
 
   def headers() do
     [
-      {"User-Agent", @user_agent},
+      {"User-Agent", @user_agent}
     ]
   end
 end

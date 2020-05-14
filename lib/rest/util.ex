@@ -7,14 +7,14 @@ defmodule WikiRest.Util do
   @spec get_body(String.t()) :: map()
   def get_body(url) do
     url
-    |> HTTPoison.get!
+    |> HTTPoison.get!()
     |> extract_body
   end
 
   @spec extract_body(HTTPoison.Response.t()) :: map()
   defp extract_body(response) do
     response.body
-    |> Jason.decode!
+    |> Jason.decode!()
   end
 
   @spec default_start_day() :: String.t()

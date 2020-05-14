@@ -22,7 +22,7 @@ defmodule WikiRecentChangesFeed do
       hidebots: 1,
       hidecategorization: 1,
       hideWikibase: 1,
-      urlversion: 1,
+      urlversion: 1
     }
   end
 

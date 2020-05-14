@@ -21,7 +21,7 @@ defmodule Elixir.MixProject do
   def application do
     [
       applications: [
-        :timex,
+        :timex
       ]
     ]
   end
