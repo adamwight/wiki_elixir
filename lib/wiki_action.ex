@@ -5,6 +5,7 @@ defmodule WikiAction do
   @username Application.get_env(:wiki_elixir, :username)
   @password Application.get_env(:wiki_elixir, :password)
   @endpoint Application.get_env(:wiki_elixir, :action_api)
+  @user_agent Application.get_env(:wiki_elixir, :user_agent)
 
   @spec stream(map()) :: Enumerable.t()
   def stream(params) do
@@ -30,8 +31,14 @@ defmodule WikiAction do
   def get(params) do
     # FIXME: support a base URL with prepended parameters, see HTTPoison.Base.build_query_params
     url = @endpoint <> "?" <> URI.encode_query(params)
-    {:ok, response} = Mojito.get(url)
+    {:ok, response} = Mojito.get(url, headers())
     response.body
       |> Jason.decode!
+  end
+
+  def headers() do
+    [
+      {"User-Agent", @user_agent},
+    ]
   end
 end
