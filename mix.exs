@@ -39,7 +39,6 @@ defmodule Elixir.MixProject do
       {:jason, "~> 1.2"},
       {:mojito, "~> 0.6"},
       {:mox, "~> 0.5", only: :test},
-      {:poison, "~> 4.0"},
       {:timex, "~> 3.5"}
     ]
   end

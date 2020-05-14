@@ -58,7 +58,7 @@ defmodule WikiSSE do
     @spec decode_message_data(EventsourceEx.Message.t()) :: map()
     defp decode_message_data(message) do
       message.data
-      |> Poison.decode!
+      |> Jason.decode!
     end
   end
 

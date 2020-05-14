@@ -14,7 +14,7 @@ defmodule WikiRest.Util do
   @spec extract_body(HTTPoison.Response.t()) :: map()
   defp extract_body(response) do
     response.body
-    |> Poison.decode!()
+    |> Jason.decode!
   end
 
   @spec default_start_day() :: String.t()
