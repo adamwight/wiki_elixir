@@ -4,7 +4,7 @@ defmodule WikiAction do
   # FIXME: underride format: :json, etc. as defaults
   @username Application.get_env(:wiki_elixir, :username)
   @password Application.get_env(:wiki_elixir, :password)
-  @endpoint Application.get_env(:wiki_elixir, :action_api)
+  @endpoint Application.get_env(:wiki_elixir, :default_site_api)
   @user_agent Application.get_env(:wiki_elixir, :user_agent)
 
   @spec stream(map()) :: Enumerable.t()
@@ -32,8 +32,14 @@ defmodule WikiAction do
     # FIXME: support a base URL with prepended parameters, see HTTPoison.Base.build_query_params
     url = @endpoint <> "?" <> URI.encode_query(params)
     {:ok, response} = HTTPoison.get(url, headers())
-    response.body
-      |> Jason.decode!
+    case params do
+      %{"format" => "json"} ->
+        response.body
+          |> Jason.decode!
+
+      _ ->
+        response.body
+    end
   end
 
   def headers() do

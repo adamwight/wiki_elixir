@@ -7,7 +7,8 @@ config :wiki_elixir,
   wikimedia_org: "https://wikimedia.org/api/rest_v1",
   sse_feed: "https://stream.wikimedia.org/v2/stream/recentchange",
 
-  action_api: "https://test.wikipedia.org/w/api.php",
+  # FIXME: per-wiki
+  default_site_api: "https://en.wikipedia.org/w/api.php",
   username: "<user>",
   password: "<pass>"
 
