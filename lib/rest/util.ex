@@ -7,7 +7,7 @@ defmodule WikiRest.Util do
   @spec get_body(String.t()) :: map()
   def get_body(url) do
     url
-    |> HTTPoison.get!()
+    |> HTTPoison.get!
     |> extract_body
   end
 

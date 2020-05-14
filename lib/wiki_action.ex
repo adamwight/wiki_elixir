@@ -31,7 +31,7 @@ defmodule WikiAction do
   def get(params) do
     # FIXME: support a base URL with prepended parameters, see HTTPoison.Base.build_query_params
     url = @endpoint <> "?" <> URI.encode_query(params)
-    {:ok, response} = Mojito.get(url, headers())
+    {:ok, response} = HTTPoison.get(url, headers())
     response.body
       |> Jason.decode!
   end

@@ -21,7 +21,6 @@ defmodule Elixir.MixProject do
   def application do
     [
       applications: [
-        :mojito,
         :timex,
       ]
     ]
@@ -37,7 +36,6 @@ defmodule Elixir.MixProject do
       {:gen_stage, "~> 0.14"},
       {:httpoison, "~> 1.5"},
       {:jason, "~> 1.2"},
-      {:mojito, "~> 0.6"},
       {:mox, "~> 0.5", only: :test},
       {:timex, "~> 3.5"}
     ]
