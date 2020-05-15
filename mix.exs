@@ -12,7 +12,10 @@ defmodule Elixir.MixProject do
       package: package(),
       source_url: "https://gitlab.com/adamwight/wiki_elixir",
       docs: [
-        extras: ["README.md"]
+        extras: [
+          "CHANGELOG.md",
+          "README.md"
+        ]
       ]
     ]
   end
@@ -21,6 +24,7 @@ defmodule Elixir.MixProject do
   def application do
     [
       applications: [
+        :logger,
         :timex
       ]
     ]
@@ -30,13 +34,13 @@ defmodule Elixir.MixProject do
   defp deps do
     [
       {:dialyxir, "~> 1.0", runtime: false},
-      {:eventsource_ex, git: "https://github.com/cwc/eventsource_ex.git"},
-      {:ex_doc, "~> 0.22", only: :dev, runtime: false},
-      {:feeder, "~> 2.3"},
+      {:eventsource_ex, "~> 0.0"},
+      {:ex_doc, "~> 0.0", only: :dev, runtime: false},
+      {:feeder, "~> 2.0"},
       {:gen_stage, "~> 1.0"},
-      {:httpoison, "~> 1.6"},
-      {:jason, "~> 1.2"},
-      {:timex, "~> 3.6"}
+      {:httpoison, "~> 0.0 or ~> 1.0"},
+      {:jason, "~> 1.0"},
+      {:timex, "~> 3.0"}
     ]
   end
 
@@ -49,7 +53,7 @@ defmodule Elixir.MixProject do
       name: :wiki_elixir,
       maintainers: ["adamwight"],
       licenses: ["GPLv3"],
-      links: %{"GitHub" => "https://github.com/adamwight/wiki_elixir"}
+      links: %{"GitLab" => "https://gitlab.com/adamwight/wiki_elixir"}
     ]
   end
 end

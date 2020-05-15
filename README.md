@@ -26,7 +26,7 @@ See the `examples/` directory for projects demonstrating each module.
 
 ## Development
 
-The project's homepage is currently [on GitHub](https://github.com/adamwight/wiki_elixir).
+The project's homepage is currently [on GitLab](https://gitlab.com/adamwight/wiki_elixir).
 To contribute, please submit an issue or a pull request.
 
 Potential future directions:
