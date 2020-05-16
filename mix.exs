@@ -24,6 +24,7 @@ defmodule Elixir.MixProject do
   def application do
     [
       applications: [
+        :httpoison,
         :logger,
         :timex
       ]
@@ -34,11 +35,10 @@ defmodule Elixir.MixProject do
   defp deps do
     [
       {:dialyxir, "~> 1.0", runtime: false},
-      {:eventsource_ex, "~> 0.0"},
       {:ex_doc, "~> 0.0", only: :dev, runtime: false},
       {:feeder, "~> 2.0"},
       {:gen_stage, "~> 1.0"},
-      {:httpoison, "~> 0.0 or ~> 1.0"},
+      {:httpoison, "~> 1.0"},
       {:jason, "~> 1.0"},
       {:timex, "~> 3.0"}
     ]
