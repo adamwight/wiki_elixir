@@ -9,8 +9,11 @@ config :wiki_elixir,
 
   # FIXME: per-wiki
   default_site_api: "https://en.wikipedia.org/w/api.php",
-  username: "<user>",
-  password: "<pass>"
+  username: "bot_username",
+  password: "bot_password"
+
+config :tesla,
+  adapter: Tesla.Adapter.Hackney
 
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this

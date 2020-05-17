@@ -38,8 +38,10 @@ defmodule Elixir.MixProject do
       {:ex_doc, "~> 0.0", only: :dev, runtime: false},
       {:feeder, "~> 2.0"},
       {:gen_stage, "~> 1.0"},
+      {:hackney, "~> 1.0"},
       {:httpoison, "~> 1.0"},
       {:jason, "~> 1.0"},
+      {:tesla, "~> 1.0"},
       {:timex, "~> 3.0"}
     ]
   end
