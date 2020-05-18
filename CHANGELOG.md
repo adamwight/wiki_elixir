@@ -14,7 +14,7 @@ What it should include:
 * Clean up REST or remove.
 * ...
 
-## 0.1.1a (-- TBD)
+## 0.1.1 (May 2020)
 
 * Send User-Agent header.
 * Action API and continuations.  Authentication, session cookies.
