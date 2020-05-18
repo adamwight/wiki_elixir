@@ -34,6 +34,7 @@ defmodule Elixir.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:cookie, "~> 0.0"},
       {:dialyxir, "~> 1.0", runtime: false},
       {:ex_doc, "~> 0.0", only: :dev, runtime: false},
       {:feeder, "~> 2.0"},

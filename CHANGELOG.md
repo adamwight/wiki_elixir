@@ -11,7 +11,6 @@ Distant future, don't attempt in v0.2:
 What it should include:
 * Test everything critical.  Detect and raise errors.
 * All server-side event streams.
-* Flexible endpoint.
 * Clean up REST or remove.
 * Drop RCFeeds / Atom
 * ...
@@ -19,7 +18,9 @@ What it should include:
 ## 0.1.1a (-- TBD)
 
 * Send User-Agent header.
-* Action API and continuations.
+* Action API and continuations.  Authentication, session cookies.
+* Pipelining.
+* Flexible endpoint.
 * Server-side events relayed as a `Stream`.
 * Simplify and package examples as scripts.
 * Begin work on REST API.

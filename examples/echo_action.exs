@@ -1,20 +1,25 @@
-client = WikiAction.authenticated_client(
+Wiki.Action.new(
+  Application.get_env(:wiki_elixir, :default_site_api)
+)
+|> Wiki.Action.authenticate(
   Application.get_env(:wiki_elixir, :username),
   Application.get_env(:wiki_elixir, :password)
 )
-response = WikiAction.get(client, %{
+|> Wiki.Action.get(%{
   action: :query,
   meta: :tokens,
   type: :csrf
 })
-WikiAction.post(client, %{
+|> (&Wiki.Action.post(&1, %{
   action: :edit,
   title: "Sandbox",
   assert: :user,
-  token: response["query"]["tokens"]["csrftoken"],
+  token: &1.result["query"]["tokens"]["csrftoken"],
   appendtext: "~~~~ was here."
-})
-|> IO.inspect
+})).()
+|> (&(&1.result)).()
+|> Jason.encode!(pretty: true)
+|> IO.puts
 
 #WikiAction.get(%{
 #  action: :query,
