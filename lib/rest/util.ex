@@ -33,11 +33,12 @@ defmodule Wiki.Rest.Util do
     middleware = [
       {Tesla.Middleware.Compression, format: "gzip"},
       {Tesla.Middleware.Headers,
-        [
-          {"user-agent", Application.get_env(:wiki_elixir, :user_agent)}
-        ]},
+       [
+         {"user-agent", Application.get_env(:wiki_elixir, :user_agent)}
+       ]},
       Tesla.Middleware.JSON
     ]
+
     Tesla.client(middleware)
   end
 end
