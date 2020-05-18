@@ -4,10 +4,10 @@ defmodule Wiki.Action.Session do
   @type result :: map()
 
   @type t :: %__MODULE__{
-               client: client,
-               cookie: cookie | nil,
-               result: result
-             }
+          client: client,
+          cookie: cookie | nil,
+          result: result
+        }
 
   defstruct client: nil,
             cookie: nil,
@@ -19,9 +19,10 @@ defmodule Wiki.Action do
 
   def new(url) do
     %Session{
-      client: client([
-        {Tesla.Middleware.BaseUrl, url},
-      ])
+      client:
+        client([
+          {Tesla.Middleware.BaseUrl, url}
+        ])
     }
   end
 
@@ -35,12 +36,12 @@ defmodule Wiki.Action do
       type: :login
     })
     |> (&post(&1, %{
-      action: :login,
-      format: :json,
-      lgname: username,
-      lgpassword: password,
-      lgtoken: &1.result["query"]["tokens"]["logintoken"]
-    })).()
+          action: :login,
+          format: :json,
+          lgname: username,
+          lgpassword: password,
+          lgtoken: &1.result["query"]["tokens"]["logintoken"]
+        })).()
   end
 
   @spec get(Session.t(), map()) :: map()
@@ -70,6 +71,7 @@ defmodule Wiki.Action do
   @spec request(Session.t(), :get | :post, Keyword.t()) :: Session.t()
   defp request(session, method, opts) do
     opts = Keyword.put(opts, :method, method)
+
     opts =
       case session.cookie do
         nil -> opts
@@ -81,7 +83,7 @@ defmodule Wiki.Action do
     cookie_jar =
       response.headers
       |> extract_cookies()
-        # TODO: Overwrite cookies when keys match.
+      # TODO: Overwrite cookies when keys match.
       |> merge_stale_cookies(session.cookie)
 
     %Session{
@@ -144,16 +146,20 @@ defmodule Wiki.Action do
 
   @spec client(list()) :: Tesla.Client.t()
   defp client(extra \\ []) do
-    middleware = extra ++ [
-      {Tesla.Middleware.Compression, format: "gzip"},
-      Tesla.Middleware.FormUrlencoded,
-      {Tesla.Middleware.Headers, [
-        {"user-agent", Application.get_env(:wiki_elixir, :user_agent)}
-      ]},
-      Tesla.Middleware.JSON,
-      # Debugging only:
-      # Tesla.Middleware.Logger,
-    ]
+    middleware =
+      extra ++
+        [
+          {Tesla.Middleware.Compression, format: "gzip"},
+          Tesla.Middleware.FormUrlencoded,
+          {Tesla.Middleware.Headers,
+           [
+             {"user-agent", Application.get_env(:wiki_elixir, :user_agent)}
+           ]},
+          Tesla.Middleware.JSON
+          # Debugging only:
+          # Tesla.Middleware.Logger,
+        ]
+
     Tesla.client(middleware)
   end
 end
