@@ -6,15 +6,8 @@ defmodule Wiki.Rest.Util do
 
   @spec get_body(String.t()) :: map()
   def get_body(url) do
-    url
-    |> HTTPoison.get!()
-    |> extract_body
-  end
-
-  @spec extract_body(HTTPoison.Response.t()) :: map()
-  defp extract_body(response) do
-    response.body
-    |> Jason.decode!()
+    client()
+    |> Tesla.get!(url: url)
   end
 
   @spec default_start_day() :: String.t()
@@ -33,5 +26,18 @@ defmodule Wiki.Rest.Util do
   @spec daystamp(Date.t()) :: String.t()
   def daystamp(datetime) do
     datetime |> Timex.format!("{YYYY}{0M}{0D}")
+  end
+
+  @spec client() :: Tesla.Client.t()
+  defp client() do
+    middleware = [
+      {Tesla.Middleware.Compression, format: "gzip"},
+      {Tesla.Middleware.Headers,
+        [
+          {"user-agent", Application.get_env(:wiki_elixir, :user_agent)}
+        ]},
+      Tesla.Middleware.JSON
+    ]
+    Tesla.client(middleware)
   end
 end
