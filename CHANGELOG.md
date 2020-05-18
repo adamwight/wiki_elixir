@@ -12,7 +12,6 @@ What it should include:
 * Test everything critical.  Detect and raise errors.
 * All server-side event streams.
 * Clean up REST or remove.
-* Drop RCFeeds / Atom
 * ...
 
 ## 0.1.1a (-- TBD)
