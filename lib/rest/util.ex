@@ -6,8 +6,8 @@ defmodule Wiki.Rest.Util do
 
   @spec get_body(String.t()) :: map()
   def get_body(url) do
-    client()
-    |> Tesla.get!(url: url)
+    %Tesla.Env{body: body} = Tesla.get!(client(), url)
+    body
   end
 
   @spec default_start_day() :: String.t()
