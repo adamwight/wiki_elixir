@@ -1,8 +1,10 @@
-defmodule WikiRest.Edits do
+defmodule Wiki.Rest.Edits do
+  alias Wiki.Rest.Util
+
   @spec edits_aggregate(String.t()) :: map()
   def edits_aggregate(project) do
-    month_ago = Timex.today() |> Timex.shift(months: -1) |> WikiRest.Util.daystamp()
-    edits_aggregate(project, month_ago, WikiRest.Util.today())
+    month_ago = Timex.today() |> Timex.shift(months: -1) |> Util.daystamp()
+    edits_aggregate(project, month_ago, Util.today())
   end
 
   @spec edits_aggregate(String.t(), String.t(), String.t()) :: map()
@@ -13,9 +15,9 @@ defmodule WikiRest.Edits do
   @spec edits_aggregate(String.t(), String.t(), String.t(), String.t(), String.t(), String.t()) ::
           map()
   def edits_aggregate(project, editor_type, page_type, granularity, start, finish) do
-    "#{WikiRest.wikimedia_org()}/metrics/edits/aggregate/#{project}/#{editor_type}/#{page_type}/#{
+    "#{Wiki.Rest.wikimedia_org()}/metrics/edits/aggregate/#{project}/#{editor_type}/#{page_type}/#{
       granularity
     }/#{start}/#{finish}"
-    |> WikiRest.Util.get_body()
+    |> Util.get_body()
   end
 end

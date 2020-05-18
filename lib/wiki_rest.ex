@@ -1,10 +1,10 @@
-defmodule WikiRest do
+defmodule Wiki.Rest do
   @moduledoc """
   Access the [Wikimedia REST API](https://www.mediawiki.org/wiki/REST_API)
 
   ## TODO
 
-  * Lots of ideosyncracies about how data is delayed in the backend.  Tune
+  * Lots of idiosyncracies about how data is delayed in the backend.  Tune
   default time parameters to play nice with job update schedules.
   """
 

@@ -1,4 +1,4 @@
-defmodule WikiRest.Util do
+defmodule Wiki.Rest.Util do
   @spec normalize_title(String.t()) :: String.t()
   def normalize_title(title) do
     title |> String.replace(" ", "_")
