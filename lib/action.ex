@@ -90,6 +90,19 @@ defmodule Wiki.Action do
 
   alias Wiki.Action.Session
 
+  @doc """
+  Create a new client session
+
+  ## Arguments
+
+  - `url` - `api.php` endpoint for the wiki you will connect to.  For example, "https://en.wikipedia.org/w/api.php".
+  - `opts` - Client configuration options,
+    - `{:overwrite, true}` - When set, the results won't accumulate, instead they will reset and
+    `session.result` will only reflect the output of the latest request in a chain.  This is
+    required when following continuations using the same session object, and will be automatically
+    enabled when using `Wiki.Action.stream`.
+  """
+  @spec new(String.t(), Session.options()) :: Session.t()
   def new(url, opts \\ []) do
     %Session{
       __client__:
@@ -100,6 +113,21 @@ defmodule Wiki.Action do
     }
   end
 
+  @doc """
+  Make requests to authenticate a client session.  This should only be done using
+  a [bot username and password](https://www.mediawiki.org/wiki/Manual:Bot_passwords),
+  which can be created for any normal user account.
+
+  ## Arguments
+
+  - `session` - Base session pointing to a wiki.
+  - `username` - Bot username, may be different than the final logged-in username.
+  - `password` - Bot password.  Protect this string, it allows others to take on-wiki actions on your behalf.
+
+  ## Return value
+
+  Authenticated session object.
+  """
   @spec authenticate(Session.t(), String.t(), String.t()) :: Session.t()
   def authenticate(session, username, password) do
     session
@@ -118,12 +146,51 @@ defmodule Wiki.Action do
         })).()
   end
 
-  @spec get(Session.t(), map()) :: map()
+  @doc """
+  Make an API GET request
+
+  ## Arguments
+
+  - `session` - `Wiki.Action.Session` object.
+  - `params` - Map of query parameters as atoms or strings.
+
+  ## Return value
+
+  Session object with a populated `:result` attribute.
+  """
+  @spec get(Session.t(), map()) :: Session.t()
   def get(session, params), do: request(session, :get, query: Map.to_list(normalize(params)))
 
-  @spec post(Session.t(), map()) :: map()
+  @doc """
+  Make an API POST request.
+
+  ## Arguments
+
+  - `session` - `Wiki.Action.Session` object.  If credentials are required for this
+  action, you should have created this object with the `authenticate/3` function.
+  - `params` - Map of query parameters as atoms or strings.
+
+  ## Return value
+
+  Session object with a populated `:result` attribute.
+  """
+  @spec post(Session.t(), map()) :: Session.t()
   def post(session, params), do: request(session, :post, body: normalize(params))
 
+  @doc """
+  Make a GET request and follow continuations until exhausted or the stream is closed.
+
+  ## Arguments
+
+  - `session` - `Wiki.Action.Session` object.
+  - `params` - Map of query parameters as atoms or strings.
+
+  ## Return value
+
+  Enumerable `Stream`, where each returned chunk is a raw result map, possibly
+  containing multiple records.  This corresponds to `session.result` from the other
+  entry points.
+  """
   @spec stream(Session.t(), map()) :: Enumerable.t()
   def stream(session, params) do
     session1 = %Session{session | opts: Keyword.put_new(session.opts, :overwrite, true)}
@@ -234,7 +301,7 @@ defmodule Wiki.Action do
   end
 
   @spec client(list()) :: Tesla.Client.t()
-  defp client(extra \\ []) do
+  defp client(extra) do
     middleware =
       extra ++
         [
