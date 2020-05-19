@@ -1,3 +1,5 @@
+# mix run ./examples/echo_action.exs
+
 Wiki.Action.new(
   Application.get_env(:wiki_elixir, :default_site_api)
 )

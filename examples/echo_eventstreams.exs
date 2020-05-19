@@ -1,4 +1,4 @@
-# mix run ./examples/echo_sse.exs
+# mix run ./examples/echo_eventstreams.exs
 
 defmodule DebugMessage do
   @spec echo_event(map()) :: String.t()
@@ -30,11 +30,11 @@ defmodule DebugMessage do
   end
 
   defp summarize_event(data) do
-    data["type"] <> " event: " <> Poison.encode!(data)
+    data["type"] <> " event: " <> Jason.encode!(data)
   end
 end
 
-WikiSSE.start_link()
-WikiSSE.stream()
+Wiki.EventStreams.start_link()
+Wiki.EventStreams.stream()
   |> Stream.map(fn message -> DebugMessage.echo_event(message) end)
   |> Stream.run()

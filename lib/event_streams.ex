@@ -1,4 +1,4 @@
-defmodule WikiSSE do
+defmodule Wiki.EventStreams do
   @moduledoc """
   This module reads from an infinite stream of [server-sent events](https://en.wikipedia.org/wiki/Server-sent_events)
   annotating actions such as editing or patrolling, as they happen on Wikimedia projects.
@@ -10,8 +10,8 @@ defmodule WikiSSE do
 
   Start reading the default feed, and expose as a GenStage.stream:
 
-    WikiSSE.start_link()
-    WikiSSE.stream() |> Stream.take(6) |> Enum.to_list |> IO.inspect
+    Wiki.EventStreams.start_link()
+    Wiki.EventStreams.stream() |> Stream.take(6) |> Enum.to_list |> IO.inspect
 
   ## TODO
 

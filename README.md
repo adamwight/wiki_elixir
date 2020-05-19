@@ -1,11 +1,15 @@
 # Wiki Elixir
 
-This project provides Elixir client modules work with Wikipedia (and other
-MediaWiki) APIs and data sources.  It currently supports the [Action API](https://www.mediawiki.org/wiki/Special:MyLanguage/API:Main_page),
-query continuation, [EventStreams](https://wikitech.wikimedia.org/wiki/Event_Platform/EventStreams) relaying, and some of the
-[RESTBase API](https://www.mediawiki.org/wiki/REST_API).
+This project provides Elixir client modules to work with Wikipedia and other
+MediaWiki APIs.  It currently supports,
+* `Wiki.Action` to access the [Action API](https://www.mediawiki.org/wiki/Special:MyLanguage/API:Main_page).
+This is a rich set of commands to query or edit almost anything on a wiki.
+* `Wiki.EventStreams` to access [EventStreams](https://wikitech.wikimedia.org/wiki/Event_Platform/EventStreams),
+a real-time feed of events.
+* `Wiki.Rest` to access [RESTBase](https://www.mediawiki.org/wiki/REST_API).
 
-Everything you'll find here is beta-quality, please suggest improvements!
+Everything you'll find here is beta-quality, please suggest improvements.  Expect the
+public interface to change.
 
 ## Installation
 
