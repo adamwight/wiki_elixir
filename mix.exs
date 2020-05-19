@@ -15,7 +15,8 @@ defmodule Elixir.MixProject do
         extras: [
           "CHANGELOG.md",
           "README.md"
-        ]
+        ],
+        main: "readme"
       ]
     ]
   end
