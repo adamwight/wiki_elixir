@@ -14,6 +14,13 @@ What it should include:
 * Clean up REST or remove.
 * ...
 
+## 0.1.2a (TBD)
+
+* Rename WikiAction -> Wiki.Action
+* Rename WikiRest -> Wiki.Rest
+* Rename WikiSSE -> Wiki.EventStreams
+* Begin work on ORES client.
+
 ## 0.1.1 (May 2020)
 
 * Send User-Agent header.

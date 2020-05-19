@@ -6,6 +6,8 @@ MediaWiki APIs.  It currently supports,
 This is a rich set of commands to query or edit almost anything on a wiki.
 * `Wiki.EventStreams` to access [EventStreams](https://wikitech.wikimedia.org/wiki/Event_Platform/EventStreams),
 a real-time feed of events.
+* `Wiki.Ores` to access [ORES](https://www.mediawiki.org/wiki/ORES), a machine-learning
+service for estimating revision and edit quality.
 * `Wiki.Rest` to access [RESTBase](https://www.mediawiki.org/wiki/REST_API).
 
 Everything you'll find here is beta-quality, please suggest improvements.  Expect the
