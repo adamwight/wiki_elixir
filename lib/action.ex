@@ -89,9 +89,20 @@ defmodule Wiki.Action do
     %Session{
       client: session.client,
       cookie: cookie_jar,
-      result: Map.merge(session.result, response.body)
+      result: recursive_merge(session.result, response.body)
     }
   end
+
+  defp recursive_merge(%{} = v1, %{} = v2), do: Map.merge(v1, v2, &recursive_merge/3)
+
+  defp recursive_merge(_key, %{} = v1, %{} = v2), do: recursive_merge(v1, v2)
+
+  defp recursive_merge(_key, v1, v2) when is_list(v1) and is_list(v2), do: v1 ++ v2
+
+  defp recursive_merge(_key, v1, v2) when v1 == v2, do: v1
+
+  # FIXME: The above is strict, and will throw an exception before overwriting values.
+  #  There should be an option to relax this behavior.
 
   @spec normalize(map()) :: map()
   defp normalize(params) do
