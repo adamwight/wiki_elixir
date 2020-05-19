@@ -1,7 +1,20 @@
 defmodule Wiki.Ores do
   @moduledoc """
   This module provides an adapter for the [ORES](https://www.mediawiki.org/wiki/ORES) scoring service.
+
+  ## Examples
+
+  ```elixir
+  Wiki.Ores.new("enwiki")
+  |> Wiki.Ores.request(%{
+    models: ["damaging", "wp10"],
+    revids: 456789
+  })
+  |> Jason.encode!(pretty: true)
+  |> IO.puts()
+  ```
   """
+
   # TODO:
   #  * Wrap models?
   #  * Chunk at 50 revisions per request.

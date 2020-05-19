@@ -30,7 +30,20 @@ Documentation can be generated with `mix docs`.
 
 ## Usage
 
-See the `examples/` directory for scripts demonstrating each module.
+Calling the action API,
+
+```elixir
+  Wiki.Action.new("https://de.wikipedia.org/w/api.php")
+  |> Wiki.Action.get(%{
+    action: :query,
+    format: :json,
+    meta: :siteinfo,
+    siprop: :statistics
+  })
+  |> IO.inspect()
+```
+
+See each module for more detailed examples.
 
 ## Development
 

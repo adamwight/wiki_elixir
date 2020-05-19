@@ -10,8 +10,13 @@ defmodule Wiki.EventStreams do
 
   Start reading the default feed, and expose as a GenStage.stream:
 
-    Wiki.EventStreams.start_link()
-    Wiki.EventStreams.stream() |> Stream.take(6) |> Enum.to_list |> IO.inspect
+  ```elixir
+  Wiki.EventStreams.start_link()
+  Wiki.EventStreams.stream()
+  |> Stream.take(6)
+  |> Enum.to_list
+  |> IO.inspect
+  ```
 
   ## TODO
 

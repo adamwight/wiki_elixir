@@ -2,6 +2,14 @@ defmodule Wiki.Rest do
   @moduledoc """
   Access the [Wikimedia REST API](https://www.mediawiki.org/wiki/REST_API)
 
+  ## Examples
+
+  ```elixir
+  Wiki.Rest.Pageviews.pageviews_per_article("en.wikipedia.org", "Quarantine")
+  |> Jason.encode!(pretty: true)
+  |> IO.puts()
+  ```
+
   ## TODO
 
   * Lots of idiosyncracies about how data is delayed in the backend.  Tune
