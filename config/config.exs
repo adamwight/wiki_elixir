@@ -3,7 +3,7 @@
 use Mix.Config
 
 config :wiki_elixir,
-  user_agent: "wiki_elixir/0.1.1 (spam@ludd.net)",
+  user_agent: "wiki_elixir/0.1.2 (spam@ludd.net)",
   wikimedia_org: "https://wikimedia.org/api/rest_v1",
   sse_feed: "https://stream.wikimedia.org/v2/stream/recentchange",
 
