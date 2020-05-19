@@ -19,7 +19,7 @@ What it should include:
 * Rename WikiAction -> Wiki.Action
 * Rename WikiRest -> Wiki.Rest
 * Rename WikiSSE -> Wiki.EventStreams
-* Begin work on ORES client.
+* Basic ORES client.
 
 ## 0.1.1 (May 2020)
 

@@ -21,6 +21,8 @@ defmodule Wiki.EventStreams do
   """
 
   defmodule Relay do
+    @moduledoc false
+
     use GenStage
 
     @type state :: {:queue.queue(), integer}
@@ -63,6 +65,8 @@ defmodule Wiki.EventStreams do
   end
 
   defmodule Source do
+    @moduledoc false
+
     def child_spec(endpoint) do
       %{
         id: Source,
@@ -73,6 +77,8 @@ defmodule Wiki.EventStreams do
   end
 
   defmodule RelaySupervisor do
+    @moduledoc false
+
     use Supervisor, restart: :permanent
 
     def init(args) do

@@ -1,25 +1,77 @@
 defmodule Wiki.Action.Session do
+  @moduledoc """
+  This module provides a struct for holding private connection state and accumulated results.
+
+  ## Fields
+
+  - `result` - Map with recursively merged values from all requests made using this session.
+  """
+
   @type client :: Tesla.Client.t()
   @type cookie :: binary()
   @type result :: map()
 
   @type t :: %__MODULE__{
-          client: client,
-          cookie: cookie | nil,
+          __client__: client,
+          __cookie__: cookie | nil,
           result: result
         }
 
-  defstruct client: nil,
-            cookie: nil,
+  defstruct __client__: nil,
+            __cookie__: nil,
             result: %{}
 end
 
 defmodule Wiki.Action do
+  @moduledoc """
+  Adapter to the MediaWiki [Action API](https://www.mediawiki.org/wiki/Special:MyLanguage/API:Main_page)
+
+  Anonymous requests,
+
+  ```elixir
+  Wiki.Action.new("https://de.wikipedia.org/w/api.php")
+  |> Wiki.Action.get(%{
+    action: :query,
+    format: :json,
+    meta: :siteinfo,
+    siprop: :statistics
+  })
+  |> IO.inspect()
+  ```
+
+  Commands can be pipelined to accumulate results and to hold authentication cookies,
+
+  ```elixir
+  Wiki.Action.new(
+    Application.get_env(:wiki_elixir, :default_site_api)
+  )
+  |> Wiki.Action.authenticate(
+    Application.get_env(:wiki_elixir, :username),
+    Application.get_env(:wiki_elixir, :password)
+  )
+  |> Wiki.Action.get(%{
+    action: :query,
+    meta: :tokens,
+    type: :csrf
+  })
+  |> (&Wiki.Action.post(&1, %{
+    action: :edit,
+    title: "Sandbox",
+    assert: :user,
+    token: &1.result["query"]["tokens"]["csrftoken"],
+    appendtext: "~~~~ was here."
+  })).()
+  |> (&(&1.result)).()
+  |> Jason.encode!(pretty: true)
+  |> IO.puts
+  ```
+  """
+
   alias Wiki.Action.Session
 
   def new(url) do
     %Session{
-      client:
+      __client__:
         client([
           {Tesla.Middleware.BaseUrl, url}
         ])
@@ -73,22 +125,22 @@ defmodule Wiki.Action do
     opts = Keyword.put(opts, :method, method)
 
     opts =
-      case session.cookie do
+      case session.__cookie__ do
         nil -> opts
-        _ -> Keyword.put(opts, :headers, [{"cookie", session.cookie}])
+        _ = cookie -> Keyword.put(opts, :headers, [{"cookie", cookie}])
       end
 
-    response = Tesla.request!(session.client, opts)
+    response = Tesla.request!(session.__client__, opts)
 
     cookie_jar =
       response.headers
       |> extract_cookies()
       # TODO: Overwrite cookies when keys match.
-      |> merge_stale_cookies(session.cookie)
+      |> merge_stale_cookies(session.__cookie__)
 
     %Session{
-      client: session.client,
-      cookie: cookie_jar,
+      __client__: session.__client__,
+      __cookie__: cookie_jar,
       result: recursive_merge(session.result, response.body)
     }
   end
