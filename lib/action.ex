@@ -5,20 +5,25 @@ defmodule Wiki.Action.Session do
   ## Fields
 
   - `result` - Map with recursively merged values from all requests made using this session.
+  - `opts` - Keyword list with options to change behavior.
   """
 
   @type client :: Tesla.Client.t()
   @type cookie :: binary()
+  @type option :: {:overwrite, true}
+  @type options :: [option()]
   @type result :: map()
 
   @type t :: %__MODULE__{
           __client__: client,
           __cookie__: cookie | nil,
+          opts: options,
           result: result
         }
 
   defstruct __client__: nil,
             __cookie__: nil,
+            opts: [],
             result: %{}
 end
 
@@ -65,16 +70,33 @@ defmodule Wiki.Action do
   |> Jason.encode!(pretty: true)
   |> IO.puts
   ```
+
+  Streaming results from multiple requests using continuation,
+
+  ```elixir
+  Wiki.Action.new("https://de.wikipedia.org/w/api.php")
+  |> Wiki.Action.stream(%{
+    action: :query,
+    format: :json,
+    list: :recentchanges,
+    rclimit: 5
+  })
+  |> Stream.take(10)
+  |> Enum.flat_map(fn response -> response["query"]["recentchanges"] end)
+  |> Enum.map(fn rc -> rc["timestamp"] <> " " <> rc["title"] end)
+  |> IO.inspect
+  ```
   """
 
   alias Wiki.Action.Session
 
-  def new(url) do
+  def new(url, opts \\ []) do
     %Session{
       __client__:
         client([
           {Tesla.Middleware.BaseUrl, url}
-        ])
+        ]),
+      opts: opts
     }
   end
 
@@ -102,15 +124,17 @@ defmodule Wiki.Action do
   @spec post(Session.t(), map()) :: map()
   def post(session, params), do: request(session, :post, body: normalize(params))
 
-  @spec stream(map()) :: Enumerable.t()
-  def stream(params) do
+  @spec stream(Session.t(), map()) :: Enumerable.t()
+  def stream(session, params) do
+    session1 = %Session{session | opts: Keyword.put_new(session.opts, :overwrite, true)}
+
     Stream.resource(
-      fn -> get(client(), params) end,
+      fn -> get(session1, params) end,
       fn prev ->
-        case prev do
+        case prev.result do
           %{"continue" => continue} ->
-            next = get(client(), Map.merge(params, continue))
-            {[next], next}
+            next = get(prev, Map.merge(params, continue))
+            {[next.result], next}
 
           _ ->
             {:halt, nil}
@@ -141,7 +165,11 @@ defmodule Wiki.Action do
     %Session{
       __client__: session.__client__,
       __cookie__: cookie_jar,
-      result: recursive_merge(session.result, response.body)
+      opts: session.opts,
+      result: case Keyword.get(session.opts, :overwrite) do
+        true -> response.body
+        _ -> recursive_merge(session.result, response.body)
+      end
     }
   end
 
@@ -152,9 +180,6 @@ defmodule Wiki.Action do
   defp recursive_merge(_key, v1, v2) when is_list(v1) and is_list(v2), do: v1 ++ v2
 
   defp recursive_merge(_key, v1, v2) when v1 == v2, do: v1
-
-  # FIXME: The above is strict, and will throw an exception before overwriting values.
-  #  There should be an option to relax this behavior.
 
   @spec normalize(map()) :: map()
   defp normalize(params) do
