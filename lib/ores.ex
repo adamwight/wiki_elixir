@@ -34,6 +34,7 @@ defmodule Wiki.Ores do
   @spec new(String.t()) :: Tesla.Client.t()
   def new(project) do
     url = Application.get_env(:wiki_elixir, :ores) <> project <> "/"
+
     client([
       {Tesla.Middleware.BaseUrl, url}
     ])
@@ -73,16 +74,16 @@ defmodule Wiki.Ores do
   defp client(extra) do
     middleware =
       extra ++
-      [
-        {Tesla.Middleware.Compression, format: "gzip"},
-        {Tesla.Middleware.Headers,
-          [
-            {"user-agent", Application.get_env(:wiki_elixir, :user_agent)}
-          ]},
-        Tesla.Middleware.JSON
-        # Debugging only:
-        # Tesla.Middleware.Logger
-      ]
+        [
+          {Tesla.Middleware.Compression, format: "gzip"},
+          {Tesla.Middleware.Headers,
+           [
+             {"user-agent", Application.get_env(:wiki_elixir, :user_agent)}
+           ]},
+          Tesla.Middleware.JSON
+          # Debugging only:
+          # Tesla.Middleware.Logger
+        ]
 
     Tesla.client(middleware)
   end

@@ -166,10 +166,11 @@ defmodule Wiki.Action do
       __client__: session.__client__,
       __cookie__: cookie_jar,
       opts: session.opts,
-      result: case Keyword.get(session.opts, :overwrite) do
-        true -> response.body
-        _ -> recursive_merge(session.result, response.body)
-      end
+      result:
+        case Keyword.get(session.opts, :overwrite) do
+          true -> response.body
+          _ -> recursive_merge(session.result, response.body)
+        end
     }
   end
 
