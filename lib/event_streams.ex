@@ -20,6 +20,7 @@ defmodule Wiki.EventStreams do
 
   ## TODO
 
+  * Currently only a single supervisor tree is supported, so calling applications can only read from one stream.
   * Track the restart ID, disconnect from the feed at some maximum queue size.  Reconnect as demand resumes.
   Application-lifetime or permanent storage for the restart ID tracking, for consumers that need an at-least-once
   guarantee.
@@ -114,6 +115,9 @@ defmodule Wiki.EventStreams do
           {:endpoint, String.t()}
           | {:send_to, GenServer.server()}
 
+  @doc """
+  Start a supervisor tree to receive and relay server-side events.
+  """
   @spec start_link(options) :: GenServer.on_start()
   def start_link(args \\ []) do
     RelaySupervisor.start_link(args)
