@@ -2,7 +2,7 @@
 
 Wiki.Ores.new("enwiki")
 |> Wiki.Ores.request(%{
-  models: "damaging",
+  models: ["damaging", "wp10"],
   revids: 456789
 })
 |> Jason.encode!(pretty: true)

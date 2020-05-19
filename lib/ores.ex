@@ -1,8 +1,10 @@
 defmodule Wiki.Ores do
   # TODO:
-  #  * Normalize lists of revids
   #  * Wrap models?
+  #  * Chunk at 50 revisions per request.
+  #  * Offer parallelism up to 4.
 
+  @spec new(String.t()) :: Tesla.Client.t()
   def new(project) do
     url = Application.get_env(:wiki_elixir, :ores) <> project <> "/"
     client([
@@ -10,10 +12,21 @@ defmodule Wiki.Ores do
     ])
   end
 
+  @spec request(Tesla.Client.t(), map()) :: map()
   def request(client, params) do
-    response = Tesla.get!(client, "/", query: Map.to_list(params))
+    response = Tesla.get!(client, "/", query: normalize(params))
     response.body
   end
+
+  defp normalize(%{} = params), do: normalize(Map.to_list(params))
+
+  defp normalize([{k, v} | tail]), do: [{k, normalize(v)} | normalize(tail)]
+
+  defp normalize([]), do: []
+
+  defp normalize(value) when is_list(value), do: Enum.join(value, "|")
+
+  defp normalize(value), do: value
 
   @spec client(list()) :: Tesla.Client.t()
   defp client(extra) do
@@ -27,7 +40,7 @@ defmodule Wiki.Ores do
           ]},
         Tesla.Middleware.JSON
         # Debugging only:
-        # Tesla.Middleware.Logger,
+        # Tesla.Middleware.Logger
       ]
 
     Tesla.client(middleware)
