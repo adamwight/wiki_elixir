@@ -9,10 +9,10 @@ defmodule Wiki.Action.Session do
   """
 
   @type client :: Tesla.Client.t()
-  @type cookie :: binary()
+  @type cookie :: binary
   @type option :: {:overwrite, true}
-  @type options :: [option()]
-  @type result :: map()
+  @type options :: [option]
+  @type result :: map
 
   @type t :: %__MODULE__{
           __client__: client,
@@ -158,7 +158,7 @@ defmodule Wiki.Action do
 
   Session object with a populated `:result` attribute.
   """
-  @spec get(Session.t(), map()) :: Session.t()
+  @spec get(Session.t(), map) :: Session.t()
   def get(session, params), do: request(session, :get, query: Map.to_list(normalize(params)))
 
   @doc """
@@ -174,7 +174,7 @@ defmodule Wiki.Action do
 
   Session object with a populated `:result` attribute.
   """
-  @spec post(Session.t(), map()) :: Session.t()
+  @spec post(Session.t(), map) :: Session.t()
   def post(session, params), do: request(session, :post, body: normalize(params))
 
   @doc """
@@ -191,7 +191,7 @@ defmodule Wiki.Action do
   containing multiple records.  This corresponds to `session.result` from the other
   entry points.
   """
-  @spec stream(Session.t(), map()) :: Enumerable.t()
+  @spec stream(Session.t(), map) :: Enumerable.t()
   def stream(session, params) do
     session1 = %Session{session | opts: Keyword.put_new(session.opts, :overwrite, true)}
 
@@ -249,7 +249,7 @@ defmodule Wiki.Action do
 
   defp recursive_merge(_key, v1, v2) when v1 == v2, do: v1
 
-  @spec normalize(map()) :: map()
+  @spec normalize(map) :: map
   defp normalize(params) do
     params
     |> defaults()
@@ -261,16 +261,16 @@ defmodule Wiki.Action do
     |> Enum.into(%{})
   end
 
-  @spec defaults(map()) :: map()
+  @spec defaults(map) :: map
   defp defaults(params) do
     format = Map.get(params, :format, :json)
     Map.merge(params, %{format: format})
   end
 
-  @spec normalize_value(list()) :: String.t()
+  @spec normalize_value(list) :: String.t()
   defp normalize_value(value) when is_list(value), do: Enum.join(value, "|")
 
-  @spec normalize_value(term()) :: String.t()
+  @spec normalize_value(term) :: String.t()
   defp normalize_value(value), do: value
 
   @spec extract_cookies(Keyword.t()) :: String.t() | nil
@@ -300,7 +300,7 @@ defmodule Wiki.Action do
     new_cookies <> "; " <> old_cookies
   end
 
-  @spec client(list()) :: Tesla.Client.t()
+  @spec client(list) :: Tesla.Client.t()
   defp client(extra) do
     middleware =
       extra ++

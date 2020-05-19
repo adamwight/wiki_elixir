@@ -54,7 +54,7 @@ defmodule Wiki.Ores do
     `[:damaging, :wp10]`, or as a single atom, `:damaging`.
     - `:revids` - Revision IDs to score, as a single integer or as a list.
   """
-  @spec request(Tesla.Client.t(), map()) :: map()
+  @spec request(Tesla.Client.t(), map) :: map
   def request(client, params) do
     response = Tesla.get!(client, "/", query: normalize(params))
     response.body
@@ -70,7 +70,7 @@ defmodule Wiki.Ores do
 
   defp normalize(value), do: value
 
-  @spec client(list()) :: Tesla.Client.t()
+  @spec client(list) :: Tesla.Client.t()
   defp client(extra) do
     middleware =
       extra ++

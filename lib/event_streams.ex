@@ -43,7 +43,7 @@ defmodule Wiki.EventStreams do
 
     @type state :: {:queue.queue(), integer}
 
-    @type reply :: {:noreply, [map()], state()}
+    @type reply :: {:noreply, [map], state}
 
     def start_link(args) do
       GenStage.start_link(__MODULE__, args, name: __MODULE__)
@@ -53,7 +53,7 @@ defmodule Wiki.EventStreams do
       {:producer, {:queue.new(), 0}}
     end
 
-    @spec handle_info(EventsourceEx.Message.t(), state()) :: reply()
+    @spec handle_info(EventsourceEx.Message.t(), state) :: reply
     def handle_info(message, {queue, pending_demand}) do
       event = decode_message_data(message)
       queue1 = :queue.in(event, queue)
@@ -61,7 +61,7 @@ defmodule Wiki.EventStreams do
       dispatch_events(queue1, pending_demand)
     end
 
-    @spec handle_demand(integer(), state()) :: reply()
+    @spec handle_demand(integer, state) :: reply
     def handle_demand(demand, {queue, pending_demand}) do
       dispatch_events(queue, demand + pending_demand)
     end
@@ -73,7 +73,7 @@ defmodule Wiki.EventStreams do
       {:noreply, events, {queue1, demand - available}}
     end
 
-    @spec decode_message_data(EventsourceEx.Message.t()) :: map()
+    @spec decode_message_data(EventsourceEx.Message.t()) :: map
     defp decode_message_data(message) do
       message.data
       |> Jason.decode!()
@@ -129,7 +129,7 @@ defmodule Wiki.EventStreams do
   @type option ::
           {:endpoint, String.t()}
           | {:send_to, GenServer.server()}
-          | {:streams, atom() | [atom()]}
+          | {:streams, atom | [atom]}
 
   @doc """
   Start a supervisor tree to receive and relay server-side events.
