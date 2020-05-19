@@ -6,6 +6,7 @@ defmodule Elixir.MixProject do
       app: :wiki_elixir,
       version: "0.1.2",
       elixir: "~> 1.8",
+      elixirc_paths: ["lib", "contrib"],
       start_permanent: Mix.env() == :prod,
       description: description(),
       deps: deps(),
