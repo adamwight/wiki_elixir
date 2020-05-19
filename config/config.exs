@@ -6,7 +6,7 @@ config :wiki_elixir,
   user_agent: "wiki_elixir/0.1.2 (spam@ludd.net)",
   ores: "https://ores.wikimedia.org/v3/scores/",
   wikimedia_org: "https://wikimedia.org/api/rest_v1",
-  sse_feed: "https://stream.wikimedia.org/v2/stream/recentchange",
+  eventstreams_base: "https://stream.wikimedia.org/v2/stream/",
 
   # FIXME: per-wiki
   default_site_api: "https://en.wikipedia.org/w/api.php",

@@ -8,10 +8,20 @@ defmodule Wiki.EventStreams do
 
   ## Examples
 
-  Start reading the default feed, and expose as a GenStage.stream:
+  Start reading the page creation feed, and expose as a GenStage.stream:
 
   ```elixir
-  Wiki.EventStreams.start_link()
+  Wiki.EventStreams.start_link(streams: "page-create")
+  Wiki.EventStreams.stream()
+  |> Stream.take(6)
+  |> Enum.to_list
+  |> IO.inspect
+  ```
+
+  Combine multiple feeds,
+
+  ```elixir
+  Wiki.EventStreams.start_link(streams: ["revision-create", "revision-score"])
   Wiki.EventStreams.stream()
   |> Stream.take(6)
   |> Enum.to_list
@@ -93,11 +103,12 @@ defmodule Wiki.EventStreams do
 
     def start_link(args) do
       endpoint = args[:endpoint] || default_endpoint()
+      url = endpoint <> normalize_streams(args[:streams])
       sink = args[:send_to] || self()
 
       children = [
         {Relay, sink},
-        {Source, endpoint}
+        {Source, url}
       ]
 
       {:ok, _} = Supervisor.start_link(children, strategy: :one_for_one)
@@ -105,8 +116,12 @@ defmodule Wiki.EventStreams do
 
     # FIXME: Define in top-level module--why does this make it inaccessible here?
     defp default_endpoint() do
-      Application.get_env(:wiki_elixir, :sse_feed)
+      Application.get_env(:wiki_elixir, :eventstreams_base)
     end
+
+    defp normalize_streams(streams) when is_list(streams), do: Enum.join(streams, ",")
+
+    defp normalize_streams(streams), do: streams
   end
 
   @type options :: [option]
@@ -114,15 +129,28 @@ defmodule Wiki.EventStreams do
   @type option ::
           {:endpoint, String.t()}
           | {:send_to, GenServer.server()}
+          | {:streams, atom() | [atom()]}
 
   @doc """
   Start a supervisor tree to receive and relay server-side events.
+
+  ## Arguments
+
+  - `options` - Keyword list,
+    - `{:endpoint, url}` - Override default endpoint.
+    - `{:send_to, pid | module}` - Instead of using the built-in streaming relay,
+    send the events directly to your own process.
+    - `{:streams, atom | [atom]}` - Select which streams to listen to.  An updated list can be
+    [found here](https://stream.wikimedia.org/?doc#/Streams).  Required.
   """
   @spec start_link(options) :: GenServer.on_start()
-  def start_link(args \\ []) do
+  def start_link(args) do
     RelaySupervisor.start_link(args)
   end
 
+  @doc """
+  Capture subscribed events and relay them as a `Stream`.
+  """
   @spec stream(keyword) :: Enumerable.t()
   def stream(options \\ []) do
     GenStage.stream([Relay], options)
