@@ -22,7 +22,9 @@ defmodule Elixir.MixProject do
           "README.md"
         ],
         main: "readme"
-      ]
+      ],
+      preferred_cli_env: [coveralls: :test],
+      test_coverage: [tool: ExCoveralls]
     ]
   end
 
@@ -39,6 +41,7 @@ defmodule Elixir.MixProject do
       {:dialyxir, "~> 1.0", only: :dev, runtime: false},
       {:doctor, "~> 0.0", only: :dev, runtime: false},
       {:ex_doc, "~> 0.0", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.12", only: :test},
       {:gen_stage, "~> 1.0"},
       {:git_hooks, "~> 0.0", only: [:dev, :test]},
       {:hackney, "~> 1.0"},

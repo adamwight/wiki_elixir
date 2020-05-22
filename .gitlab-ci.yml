@@ -9,6 +9,6 @@ image: elixir:latest
 mix:
   script:
     - mkdir -p priv/plts
+    - mix deps.get
     - mix deps.clean --unused
-    - mix deps.update --all
     - mix git_hooks.run all
