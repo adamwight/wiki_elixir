@@ -267,10 +267,11 @@ defmodule Wiki.Action do
     Map.merge(params, %{format: format})
   end
 
-  @spec normalize_value(list) :: String.t()
+  @spec normalize_value(term) :: String.t()
+  defp normalize_value(value)
+
   defp normalize_value(value) when is_list(value), do: Enum.join(value, "|")
 
-  @spec normalize_value(term) :: String.t()
   defp normalize_value(value), do: value
 
   @spec extract_cookies(Keyword.t()) :: String.t() | nil

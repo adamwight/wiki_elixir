@@ -53,6 +53,7 @@ if Mix.env() != :prod do
           "mix compile --warnings-as-errors",
           "mix format --check-formatted",
           "mix credo --strict",
+          "mix dialyzer",
           "mix doctor",
           "mix test"
         ]

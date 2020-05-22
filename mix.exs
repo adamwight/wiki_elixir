@@ -12,6 +12,10 @@ defmodule Elixir.MixProject do
       deps: deps(),
       package: package(),
       source_url: "https://gitlab.com/adamwight/wiki_elixir",
+      dialyzer: [
+        plt_add_apps: [:cookie, :gen_stage, :jason, :tesla],
+        plt_core_path: "priv/plts/"
+      ],
       docs: [
         extras: [
           "CHANGELOG.md",
@@ -38,7 +42,7 @@ defmodule Elixir.MixProject do
     [
       {:cookie, "~> 0.0"},
       {:credo, "~> 1.0", only: :dev, runtime: false},
-      {:dialyxir, "~> 1.0", runtime: false},
+      {:dialyxir, "~> 1.0", only: :dev, runtime: false},
       {:doctor, "~> 0.0", only: :dev, runtime: false},
       {:ex_doc, "~> 0.0", only: :dev, runtime: false},
       {:gen_stage, "~> 1.0"},

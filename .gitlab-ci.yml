@@ -1,3 +1,10 @@
+cache:
+  key: shared
+  paths:
+    - _build/
+    - deps/
+    - priv/plts/
+
 image: elixir:latest
 
 before_script:
@@ -7,4 +14,6 @@ before_script:
 
 mix:
   script:
+    - mix deps.clean --unused
+    - mix deps.update --all
     - mix git_hooks.run all
