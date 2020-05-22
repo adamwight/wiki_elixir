@@ -40,6 +40,11 @@ defmodule ActionTest do
 
     TeslaAdapterMock
     |> expect(:call, fn env, _opts ->
+      [{"user-agent", user_agent}] = env.headers
+      assert String.match?(user_agent, ~r/wiki_elixir/)
+      assert env.method == :get
+      assert env.query == [action: :query, format: :json, meta: :siteinfo, siprop: :statistics]
+
       {:ok, %Env{env | body: canned_response, headers: [], status: 200}}
     end)
 
