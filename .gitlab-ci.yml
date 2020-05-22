@@ -6,9 +6,13 @@ cache:
 
 image: elixir:latest
 
+before_script:
+  - mix local.rebar --force
+  - mix local.hex --force
+  - mix deps.get
+
 mix:
   script:
     - mkdir -p priv/plts
-    - mix deps.get
     - mix deps.clean --unused
     - mix git_hooks.run all
