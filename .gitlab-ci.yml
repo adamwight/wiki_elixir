@@ -1,5 +1,4 @@
 cache:
-  key: $CI_COMMIT_REF_SLUG
   paths:
     - _build/
     - deps/
@@ -9,6 +8,7 @@ image: elixir:latest
 
 mix:
   script:
+    - mkdir -p priv/plts
     - mix deps.clean --unused
     - mix deps.update --all
     - mix git_hooks.run all
