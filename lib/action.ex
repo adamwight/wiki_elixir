@@ -241,7 +241,11 @@ defmodule Wiki.Action do
     }
   end
 
+  @spec recursive_merge(map, map) :: map
   defp recursive_merge(%{} = v1, %{} = v2), do: Map.merge(v1, v2, &recursive_merge/3)
+
+  @spec recursive_merge(String.t(), map | String.t(), map | String.t()) :: map
+  defp recursive_merge(_key, v1, v2)
 
   defp recursive_merge(_key, %{} = v1, %{} = v2), do: recursive_merge(v1, v2)
 
@@ -287,13 +291,20 @@ defmodule Wiki.Action do
     for {k, v} <- headers, k == key, do: v
   end
 
+  @spec parse_cookies(list) :: list
+  defp parse_cookies(headers)
+
   defp parse_cookies([]), do: []
 
   defp parse_cookies([header | others]), do: [SetCookie.parse(header) | parse_cookies(others)]
 
+  @spec repack_cookies([map]) :: Keyword.t()
   defp repack_cookies(cookies) do
     for %{key: k, value: v} <- cookies, do: {k, v}
   end
+
+  @spec merge_stale_cookies(String.t(), String.t() | nil) :: String.t()
+  defp merge_stale_cookies(new_cookies, old_cookies)
 
   defp merge_stale_cookies(new_cookies, nil), do: new_cookies
 

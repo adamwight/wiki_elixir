@@ -1,23 +1,22 @@
 # Wiki Elixir
 
-This project provides Elixir client modules to work with Wikipedia and other
-MediaWiki APIs.  It currently supports,
+This project provides unofficial Elixir client modules for Wikipedia and other
+MediaWiki sites.  It currently supports,
 * `Wiki.Action` to access the [Action API](https://www.mediawiki.org/wiki/Special:MyLanguage/API:Main_page).
 This is a rich set of commands to query or edit almost anything on a wiki.
 * `Wiki.EventStreams` to access [EventStreams](https://wikitech.wikimedia.org/wiki/Event_Platform/EventStreams),
 a real-time feed of events.
-* `Wiki.Ores` to access the [ORES](https://www.mediawiki.org/wiki/ORES) [API](https://ores.wikimedia.org/v3/),
-a machine-learning service for estimating revision and edit quality.
+* `Wiki.Ores` to access the [ORES](https://www.mediawiki.org/wiki/ORES) service [API](https://ores.wikimedia.org/v3/),
+machine-learning models for estimating revision and edit quality.
 * `Wiki.Rest` to access the Wikimedia [REST API](https://www.mediawiki.org/wiki/REST_API).
 
 Everything you'll find here is beta-quality, please suggest improvements.  Expect the
-public interface to change, this project uses [semantic versioning](https://semver.org/) so
+public interface to change, this project uses [semantic versioning](https://semver.org/) and
 the "0.x" releases should be taken literally.
 
 ## Installation
 
-The package can be installed by adding `wiki_elixir` to your list of dependencies in
-`mix.exs`,
+Install this package by adding `wiki_elixir` to your dependencies in `mix.exs`,
 
 ```elixir
 def deps do

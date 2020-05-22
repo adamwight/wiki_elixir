@@ -60,15 +60,21 @@ defmodule Wiki.Ores do
     response.body
   end
 
+  @spec normalize(map | Keyword.t()) :: Keyword.t()
+  defp normalize(params)
+
   defp normalize(%{} = params), do: normalize(Map.to_list(params))
 
-  defp normalize([{k, v} | tail]), do: [{k, normalize(v)} | normalize(tail)]
+  defp normalize([{k, v} | tail]), do: [{k, normalize_value(v)} | normalize(tail)]
 
   defp normalize([]), do: []
 
-  defp normalize(value) when is_list(value), do: Enum.join(value, "|")
+  @spec normalize_value(String.t() | atom | [String.t() | atom]) :: String.t() | atom
+  defp normalize_value(value)
 
-  defp normalize(value), do: value
+  defp normalize_value(value) when is_list(value), do: Enum.join(value, "|")
+
+  defp normalize_value(value), do: value
 
   @spec client(list) :: Tesla.Client.t()
   defp client(extra) do

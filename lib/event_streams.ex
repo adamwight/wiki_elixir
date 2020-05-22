@@ -120,6 +120,9 @@ defmodule Wiki.EventStreams do
       Application.get_env(:wiki_elixir, :eventstreams_base)
     end
 
+    @spec normalize_streams(atom | [atom]) :: atom | String.t()
+    defp normalize_streams(streams)
+
     defp normalize_streams(streams) when is_list(streams), do: Enum.join(streams, ",")
 
     defp normalize_streams(streams), do: streams
