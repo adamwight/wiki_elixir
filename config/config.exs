@@ -47,7 +47,7 @@ if Mix.env() != :prod do
   config :git_hooks,
     verbose: true,
     hooks: [
-      pre_commit: [
+      pre_push: [
         tasks: [
           "mix clean",
           "mix compile --warnings-as-errors",

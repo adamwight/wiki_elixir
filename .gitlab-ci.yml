@@ -1,5 +1,5 @@
 cache:
-  key: shared
+  key: $CI_COMMIT_REF_SLUG
   paths:
     - _build/
     - deps/
