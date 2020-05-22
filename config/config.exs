@@ -13,6 +13,7 @@ config :wiki_elixir,
   username: "bot_username",
   password: "bot_password"
 
+# FIXME: Configure in a way that's easier to override from calling applications?
 config :tesla,
   adapter: Tesla.Adapter.Hackney
 
@@ -35,14 +36,6 @@ config :tesla,
 #     config :logger, level: :info
 #
 
-# It is also possible to import configuration files, relative to this
-# directory. For example, you can emulate configuration per environment
-# by uncommenting the line below and defining dev.exs, test.exs and such.
-# Configuration from the imported file will override the ones defined
-# here (which is why it is important to import them last).
-#
-#     import_config "#{Mix.env()}.exs"
-
 if Mix.env() != :prod do
   config :git_hooks,
     verbose: true,
@@ -60,3 +53,11 @@ if Mix.env() != :prod do
       ]
     ]
 end
+
+# It is also possible to import configuration files, relative to this
+# directory. For example, you can emulate configuration per environment
+# by uncommenting the line below and defining dev.exs, test.exs and such.
+# Configuration from the imported file will override the ones defined
+# here (which is why it is important to import them last).
+#
+import_config "#{Mix.env()}.exs"

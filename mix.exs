@@ -28,13 +28,7 @@ defmodule Elixir.MixProject do
 
   # Run "mix help compile.app" to learn about applications.
   def application do
-    [
-      applications: [
-        :httpoison,
-        :logger,
-        :timex
-      ]
-    ]
+    [extra_applications: [:logger]]
   end
 
   # Run "mix help deps" to learn about dependencies.
@@ -46,10 +40,11 @@ defmodule Elixir.MixProject do
       {:doctor, "~> 0.0", only: :dev, runtime: false},
       {:ex_doc, "~> 0.0", only: :dev, runtime: false},
       {:gen_stage, "~> 1.0"},
-      {:git_hooks, "~> 0.0", only: :dev, runtime: false},
+      {:git_hooks, "~> 0.0", only: [:dev, :test]},
       {:hackney, "~> 1.0"},
       {:httpoison, "~> 1.0"},
       {:jason, "~> 1.0"},
+      {:mox, "~> 0.5", only: :test},
       {:tesla, "~> 1.0"},
       {:timex, "~> 3.0"}
     ]
