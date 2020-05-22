@@ -16,6 +16,8 @@ What it should include:
 
 ## 0.1.3a (TBD)
 
+* Begin writing tests.
+* Add lint jobs to git hook and GitLab CI.
 * ...
 
 ## 0.1.2 (May 2020)

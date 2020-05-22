@@ -1,7 +1,10 @@
 # Wiki Elixir
 
-This project provides unofficial Elixir client modules for Wikipedia and other
-MediaWiki sites.  It currently supports,
+This project provides unofficial Elixir client modules for Wikipedia and other MediaWiki sites.
+
+[![pipeline status](https://gitlab.com/adamwight/wiki_elixir/badges/master/pipeline.svg)](https://gitlab.com/adamwight/wiki_elixir/-/commits/master) [![coverage report](https://gitlab.com/adamwight/wiki_elixir/badges/master/coverage.svg)](https://gitlab.com/adamwight/wiki_elixir/-/commits/master)
+
+Currently supported,
 * `Wiki.Action` to access the [Action API](https://www.mediawiki.org/wiki/Special:MyLanguage/API:Main_page).
 This is a rich set of commands to query or edit almost anything on a wiki.
 * `Wiki.EventStreams` to access [EventStreams](https://wikitech.wikimedia.org/wiki/Event_Platform/EventStreams),
@@ -30,7 +33,7 @@ Documentation is generated with `mix docs`.
 
 ## Usage
 
-Calling the action API,
+A simple call to the action API,
 
 ```elixir
 Wiki.Action.new("https://de.wikipedia.org/w/api.php")
@@ -48,9 +51,9 @@ See each module for more detailed examples.
 ## Development
 
 The project's homepage is currently [on GitLab](https://gitlab.com/adamwight/wiki_elixir).
-To contribute, please submit an issue or a pull request.
+To contribute, please submit an issue or a merge request.
 
-Install the pre-push git hook using,
+The easiest way to run linters is to install the pre-push git hook using,
 
 ```shell script
 mix git_hooks.install
