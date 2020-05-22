@@ -37,9 +37,12 @@ defmodule Elixir.MixProject do
   defp deps do
     [
       {:cookie, "~> 0.0"},
+      {:credo, "~> 1.0", only: :dev, runtime: false},
       {:dialyxir, "~> 1.0", runtime: false},
+      {:doctor, "~> 0.0", only: :dev, runtime: false},
       {:ex_doc, "~> 0.0", only: :dev, runtime: false},
       {:gen_stage, "~> 1.0"},
+      {:git_hooks, "~> 0.0", only: :dev, runtime: false},
       {:hackney, "~> 1.0"},
       {:httpoison, "~> 1.0"},
       {:jason, "~> 1.0"},

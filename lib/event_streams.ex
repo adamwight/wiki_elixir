@@ -86,7 +86,8 @@ defmodule Wiki.EventStreams do
     def child_spec(endpoint) do
       %{
         id: Source,
-        # FIXME: nicer if we could get the Relay sibling's specific PID each time, to allow an app to use multiple stream listeners.
+        # FIXME: nicer if we could get the Relay sibling's specific PID each time,
+        #  to allow an app to use multiple stream listeners.
         start: {EventsourceEx, :new, [endpoint, [headers: [], stream_to: Relay]]}
       }
     end
@@ -115,7 +116,7 @@ defmodule Wiki.EventStreams do
     end
 
     # FIXME: Define in top-level module--why does this make it inaccessible here?
-    defp default_endpoint() do
+    defp default_endpoint do
       Application.get_env(:wiki_elixir, :eventstreams_base)
     end
 

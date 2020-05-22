@@ -1,4 +1,8 @@
 defmodule Wiki.Rest.Pageviews do
+  @moduledoc """
+  Retrieve aggregate pageview counts for any Wikimedia project, https://wikimedia.org/api/rest_v1/#/Pageviews%20data
+  """
+
   alias Wiki.Rest.Util
 
   @spec pageviews_per_article(String.t(), String.t()) :: map()

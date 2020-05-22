@@ -7,5 +7,4 @@ before_script:
 
 mix:
   script:
-    - mix test
-    - mix format --check-formatted
+    - mix git_hooks.run all

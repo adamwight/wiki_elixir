@@ -20,7 +20,7 @@ defmodule Wiki.Rest do
   @wikimedia_org "https://wikimedia.org/api/rest_v1"
 
   # FIXME: how does this work, anyway
-  def wikimedia_org() do
+  def wikimedia_org do
     @wikimedia_org
   end
 end

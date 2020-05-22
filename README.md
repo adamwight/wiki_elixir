@@ -8,10 +8,11 @@ This is a rich set of commands to query or edit almost anything on a wiki.
 a real-time feed of events.
 * `Wiki.Ores` to access the [ORES](https://www.mediawiki.org/wiki/ORES) [API](https://ores.wikimedia.org/v3/),
 a machine-learning service for estimating revision and edit quality.
-* `Wiki.Rest` to access [RESTBase](https://www.mediawiki.org/wiki/REST_API).
+* `Wiki.Rest` to access the Wikimedia [REST API](https://www.mediawiki.org/wiki/REST_API).
 
 Everything you'll find here is beta-quality, please suggest improvements.  Expect the
-public interface to change.
+public interface to change, this project uses [semantic versioning](https://semver.org/) so
+the "0.x" releases should be taken literally.
 
 ## Installation
 
@@ -26,7 +27,7 @@ def deps do
 end
 ```
 
-Documentation can be generated with `mix docs`.
+Documentation is generated with `mix docs`.
 
 ## Usage
 

@@ -1,4 +1,6 @@
 defmodule Wiki.Rest.Util do
+  @moduledoc false
+
   @spec normalize_title(String.t()) :: String.t()
   def normalize_title(title) do
     title |> String.replace(" ", "_")
@@ -11,14 +13,14 @@ defmodule Wiki.Rest.Util do
   end
 
   @spec default_start_day() :: String.t()
-  def default_start_day() do
+  def default_start_day do
     Timex.today()
     |> Timex.shift(days: -7)
     |> daystamp
   end
 
   @spec today() :: String.t()
-  def today() do
+  def today do
     Timex.today()
     |> daystamp
   end
@@ -29,7 +31,7 @@ defmodule Wiki.Rest.Util do
   end
 
   @spec client() :: Tesla.Client.t()
-  defp client() do
+  defp client do
     middleware = [
       {Tesla.Middleware.Compression, format: "gzip"},
       {Tesla.Middleware.Headers,

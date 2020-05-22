@@ -1,4 +1,8 @@
 defmodule Wiki.Rest.Edits do
+  @moduledoc """
+  Retrieve edit counts for a Wikimedia project, https://wikimedia.org/api/rest_v1/#/Edits%20data
+  """
+
   alias Wiki.Rest.Util
 
   @spec edits_aggregate(String.t()) :: map()
