@@ -33,14 +33,14 @@ Documentation is generated with `mix docs`.
 Calling the action API,
 
 ```elixir
-  Wiki.Action.new("https://de.wikipedia.org/w/api.php")
-  |> Wiki.Action.get(%{
-    action: :query,
-    format: :json,
-    meta: :siteinfo,
-    siprop: :statistics
-  })
-  |> IO.inspect()
+Wiki.Action.new("https://de.wikipedia.org/w/api.php")
+|> Wiki.Action.get(%{
+  action: :query,
+  format: :json,
+  meta: :siteinfo,
+  siprop: :statistics
+})
+|> IO.inspect()
 ```
 
 See each module for more detailed examples.
@@ -49,3 +49,9 @@ See each module for more detailed examples.
 
 The project's homepage is currently [on GitLab](https://gitlab.com/adamwight/wiki_elixir).
 To contribute, please submit an issue or a pull request.
+
+Install the pre-push git hook using,
+
+```shell script
+mix git_hooks.install
+```
