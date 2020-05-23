@@ -39,14 +39,16 @@ A simple call to the action API,
 Wiki.Action.new("https://de.wikipedia.org/w/api.php")
 |> Wiki.Action.get(%{
   action: :query,
-  format: :json,
   meta: :siteinfo,
   siprop: :statistics
 })
+|> (&(&1.result)).()
 |> IO.inspect()
 ```
 
 See each module for more detailed examples.
+
+The `:format` parameter always defaults to `:json` unless overridden.
 
 ## Development
 

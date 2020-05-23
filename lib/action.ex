@@ -37,10 +37,10 @@ defmodule Wiki.Action do
   Wiki.Action.new("https://de.wikipedia.org/w/api.php")
   |> Wiki.Action.get(%{
     action: :query,
-    format: :json,
     meta: :siteinfo,
     siprop: :statistics
   })
+  |> (&(&1.result)).()
   |> IO.inspect()
   ```
 
@@ -77,7 +77,6 @@ defmodule Wiki.Action do
   Wiki.Action.new("https://de.wikipedia.org/w/api.php")
   |> Wiki.Action.stream(%{
     action: :query,
-    format: :json,
     list: :recentchanges,
     rclimit: 5
   })
@@ -133,13 +132,11 @@ defmodule Wiki.Action do
     session
     |> get(%{
       action: :query,
-      format: :json,
       meta: :tokens,
       type: :login
     })
     |> (&post(&1, %{
           action: :login,
-          format: :json,
           lgname: username,
           lgpassword: password,
           lgtoken: &1.result["query"]["tokens"]["logintoken"]
