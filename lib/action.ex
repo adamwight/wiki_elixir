@@ -153,7 +153,7 @@ defmodule Wiki.Action do
 
   ## Return value
 
-  Session object with a populated `:result` attribute.
+  Session object with its `.result` populated.
   """
   @spec get(Session.t(), map) :: Session.t()
   def get(session, params), do: request(session, :get, query: Map.to_list(normalize(params)))

@@ -137,4 +137,7 @@ defmodule ActionTest do
 
     assert session.__cookies__ == %{"mediawiki_session" => "new_cookie", "a" => "b"}
   end
+
+  # TODO: test "pipe-joins lists"
+  # TODO: test "merges results
 end
