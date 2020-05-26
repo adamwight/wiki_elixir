@@ -9,20 +9,20 @@ defmodule Wiki.Action.Session do
   """
 
   @type client :: Tesla.Client.t()
-  @type cookie :: binary
+  @type cookies :: map
   @type option :: {:overwrite, true}
   @type options :: [option]
   @type result :: map
 
   @type t :: %__MODULE__{
           __client__: client,
-          __cookie__: cookie | nil,
+          __cookies__: cookies,
           opts: options,
           result: result
         }
 
   defstruct __client__: nil,
-            __cookie__: nil,
+            __cookies__: %{},
             opts: [],
             result: %{}
 end
@@ -213,9 +213,10 @@ defmodule Wiki.Action do
     opts = Keyword.put(opts, :method, method)
 
     opts =
-      case session.__cookie__ do
-        nil -> opts
-        _ = cookie -> Keyword.put(opts, :headers, [{"cookie", cookie}])
+      if map_size(session.__cookies__) > 0 do
+        Keyword.put(opts, :headers, [{"cookie", serialize_cookies(session.__cookies__)}])
+      else
+        opts
       end
 
     response = Tesla.request!(session.__client__, opts)
@@ -223,12 +224,11 @@ defmodule Wiki.Action do
     cookie_jar =
       response.headers
       |> extract_cookies()
-      # TODO: Overwrite cookies when keys match.
-      |> merge_stale_cookies(session.__cookie__)
+      |> update_cookies(session.__cookies__)
 
     %Session{
       __client__: session.__client__,
-      __cookie__: cookie_jar,
+      __cookies__: cookie_jar,
       opts: session.opts,
       result:
         case Keyword.get(session.opts, :overwrite) do
@@ -275,38 +275,44 @@ defmodule Wiki.Action do
 
   defp normalize_value(value), do: value
 
-  @spec extract_cookies(Keyword.t()) :: String.t() | nil
+  @spec update_cookies(map, map) :: map
+  defp update_cookies(new_cookies, old_cookies) do
+    # TODO: Use a library conforming to RFC 6265, for example respecting expiry.
+    Map.merge(old_cookies, new_cookies)
+  end
+
+  @spec extract_cookies(Keyword.t()) :: map
   defp extract_cookies(headers) do
     headers
     |> get_headers("set-cookie")
     |> parse_cookies()
     |> repack_cookies()
-    |> Cookie.serialize()
   end
 
+  @spec get_headers(Keyword.t(), String.t()) :: [String.t()]
   defp get_headers(headers, key) do
     for {k, v} <- headers, k == key, do: v
   end
 
-  @spec parse_cookies(list) :: list
-  defp parse_cookies(headers)
+  @spec parse_cookies([String.t()]) :: [map]
+  defp parse_cookies(cookie_headers)
 
   defp parse_cookies([]), do: []
 
   defp parse_cookies([header | others]), do: [SetCookie.parse(header) | parse_cookies(others)]
 
-  @spec repack_cookies([map]) :: Keyword.t()
+  @spec repack_cookies([map]) :: map
   defp repack_cookies(cookies) do
-    for %{key: k, value: v} <- cookies, do: {k, v}
+    cookies
+    |> Enum.map(fn %{key: k, value: v} -> {k, v} end)
+    |> Enum.into(%{})
   end
 
-  @spec merge_stale_cookies(String.t(), String.t() | nil) :: String.t()
-  defp merge_stale_cookies(new_cookies, old_cookies)
-
-  defp merge_stale_cookies(new_cookies, nil), do: new_cookies
-
-  defp merge_stale_cookies(new_cookies, old_cookies) do
-    new_cookies <> "; " <> old_cookies
+  @spec serialize_cookies(map) :: String.t()
+  defp serialize_cookies(cookies) do
+    cookies
+    |> Enum.map(fn {key, value} -> key <> "=" <> value end)
+    |> Enum.join("; ")
   end
 
   @spec client(list) :: Tesla.Client.t()
@@ -322,7 +328,7 @@ defmodule Wiki.Action do
            ]},
           Tesla.Middleware.JSON
           # Debugging only:
-          # Tesla.Middleware.Logger,
+          # Tesla.Middleware.Logger
         ]
 
     Tesla.client(middleware)
