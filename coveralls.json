@@ -1,5 +1,8 @@
 {
   "coverage_options": {
-    "minimum_coverage": 24
-  }
+    "minimum_coverage": 31
+  },
+  "skip_files": [
+    "contrib"
+  ]
 }
