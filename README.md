@@ -11,7 +11,11 @@ This is a rich set of commands to query or edit almost anything on a wiki.
 a real-time feed of events.
 * `Wiki.Ores` to access the [ORES](https://www.mediawiki.org/wiki/ORES) service [API](https://ores.wikimedia.org/v3/),
 machine-learning models for estimating revision and edit quality.
-* `Wiki.Rest` to access the Wikimedia [REST API](https://www.mediawiki.org/wiki/REST_API).
+
+Considered for a future version,
+* Client for the many Wikimedia [REST API](https://www.mediawiki.org/wiki/REST_API )s served through RESTBase.
+See [issue #2](https://gitlab.com/adamwight/wiki_elixir/-/issues/2)
+* Built-in [REST API](https://www.mediawiki.org/wiki/API:REST_API).
 
 Everything you'll find here is beta-quality, please suggest improvements.  Expect the
 public interface to change, this project uses [semantic versioning](https://semver.org/) and
