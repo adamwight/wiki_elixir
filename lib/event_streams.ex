@@ -45,14 +45,17 @@ defmodule Wiki.EventStreams do
 
     @type reply :: {:noreply, [map], state}
 
+    @spec start_link(keyword) :: GenServer.on_start()
     def start_link(args) do
       GenStage.start_link(__MODULE__, args, name: __MODULE__)
     end
 
+    @impl true
     def init(_) do
       {:producer, {:queue.new(), 0}}
     end
 
+    @impl true
     @spec handle_info(EventsourceEx.Message.t(), state) :: reply
     def handle_info(message, {queue, pending_demand}) do
       event = decode_message_data(message)
@@ -61,6 +64,7 @@ defmodule Wiki.EventStreams do
       dispatch_events(queue1, pending_demand)
     end
 
+    @impl true
     @spec handle_demand(integer, state) :: reply
     def handle_demand(demand, {queue, pending_demand}) do
       dispatch_events(queue, demand + pending_demand)
@@ -83,6 +87,7 @@ defmodule Wiki.EventStreams do
   defmodule Source do
     @moduledoc false
 
+    @spec child_spec(String.t()) :: map
     def child_spec(endpoint) do
       %{
         id: Source,
@@ -98,10 +103,7 @@ defmodule Wiki.EventStreams do
 
     use Supervisor, restart: :permanent
 
-    def init(args) do
-      {:ok, args}
-    end
-
+    @spec start_link(keyword) :: GenServer.on_start()
     def start_link(args) do
       endpoint = args[:endpoint] || default_endpoint()
       url = endpoint <> normalize_streams(args[:streams])
@@ -113,6 +115,11 @@ defmodule Wiki.EventStreams do
       ]
 
       {:ok, _} = Supervisor.start_link(children, strategy: :one_for_one)
+    end
+
+    @impl true
+    def init(args) do
+      {:ok, args}
     end
 
     # FIXME: Define in top-level module--why does this make it inaccessible here?
