@@ -4,29 +4,31 @@
 
 Distant future, don't attempt in v0.2:
 * Detect Wikimedia site matrix.
-* Discover APIs (and warn that this should be configured?  cache?)
+* Discover APIs (and warn that this should be configured?  cache?), generate matching client.
 
 ## 0.2.0-TODO
 
 What it should include:
-* Test everything critical.  Detect and raise errors.
-* All server-side event streams.
-* Clean up REST or remove.
+* Test everything critical.
+* Detect server and network errors, fail fast.
+* Atoms for selecting the known server-side event streams.
 * ...
 
 ## 0.1.3a (TBD)
 
-* Begin writing tests.
+* Some test coverage for `Wiki.Action`.
 * Add lint jobs to git hook and GitLab CI.
+* Removed the incomplete `Wiki.Rest` client.
+* Fix a continuation bug which would drop the first response.
 * ...
 
 ## 0.1.2 (May 2020)
 
-* Rename WikiAction -> Wiki.Action
-* Rename WikiRest -> Wiki.Rest
-* Rename WikiSSE -> Wiki.EventStreams
+* Rename WikiAction -> `Wiki.Action`
+* Rename WikiRest -> `Wiki.Rest`
+* Rename WikiSSE -> `Wiki.EventStreams`
 * Basic ORES client.
-* Inline examples.
+* Inline examples as module documentation.
 
 ## 0.1.1 (May 2020)
 
