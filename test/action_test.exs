@@ -20,6 +20,9 @@ defmodule ActionTest do
     canned_response = %{
       "batchcomplete" => "",
       "query" => %{
+        "general" => %{
+          "mainpage" => "Main Page"
+        },
         "statistics" => %{
           "activeusers" => 20_132,
           "admins" => 193,
@@ -41,9 +44,16 @@ defmodule ActionTest do
     TeslaAdapterMock
     |> expect(:call, fn env, _opts ->
       [{"user-agent", user_agent}] = env.headers
+
       assert String.match?(user_agent, ~r/wiki_elixir/)
       assert env.method == :get
-      assert env.query == [action: :query, format: :json, meta: :siteinfo, siprop: :statistics]
+
+      assert env.query == [
+               action: :query,
+               format: :json,
+               meta: :siteinfo,
+               siprop: "general|statistics"
+             ]
 
       {:ok, %Env{env | body: canned_response, headers: [], status: 200}}
     end)
@@ -69,7 +79,7 @@ defmodule ActionTest do
         action: :query,
         format: :json,
         meta: :siteinfo,
-        siprop: :statistics
+        siprop: [:general, :statistics]
       })
 
     assert session.result["appended"] == ["a", "b"]
