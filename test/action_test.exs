@@ -148,6 +148,61 @@ defmodule ActionTest do
     assert session.__cookies__ == %{"mediawiki_session" => "new_cookie", "a" => "b"}
   end
 
-  # TODO: test "pipe-joins lists"
-  # TODO: test "merges results
+  test "streams continuations" do
+    TeslaAdapterMock
+    |> expect(:call, fn env, _opts ->
+      {:ok,
+       %Env{
+         env
+         | body: %{
+             "batchcomplete" => "",
+             "continue" => %{"continue" => "-||", "rccontinue" => "20200519061025|633"},
+             "query" => %{
+               "recentchanges" => [
+                 %{"revid" => 616},
+                 %{"revid" => 615}
+               ]
+             }
+           },
+           status: 200
+       }}
+    end)
+    |> expect(:call, fn env, _opts ->
+      assert env.query == [
+               {:action, :query},
+               {:format, :json},
+               {:list, :recentchanges},
+               {:rclimit, 2},
+               {"continue", "-||"},
+               {"rccontinue", "20200519061025|633"}
+             ]
+
+      {:ok,
+       %Env{
+         env
+         | body: %{
+             "batchcomplete" => "",
+             "query" => %{
+               "recentchanges" => [
+                 %{"revid" => 614},
+                 %{"revid" => 613}
+               ]
+             }
+           },
+           status: 200
+       }}
+    end)
+
+    recent_changes =
+      Action.new("https://dewiki.test/w/api.php")
+      |> Action.stream(%{
+        action: :query,
+        list: :recentchanges,
+        rclimit: 2
+      })
+      |> Enum.flat_map(fn response -> response["query"]["recentchanges"] end)
+      |> Enum.map(fn rc -> rc["revid"] end)
+
+    assert recent_changes == [616, 615, 614, 613]
+  end
 end

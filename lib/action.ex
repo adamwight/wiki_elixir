@@ -193,22 +193,27 @@ defmodule Wiki.Action do
     session1 = %Session{session | opts: Keyword.put_new(session.opts, :overwrite, true)}
 
     Stream.resource(
-      fn -> get(session1, params) end,
-      fn prev ->
-        case prev.result do
-          %{"continue" => continue} ->
-            next = get(prev, Map.merge(params, continue))
-            {[next.result], next}
+      fn -> {session1, :start} end,
+      fn
+        {prev, :start} ->
+          do_stream_get(prev, params)
 
-          _ ->
-            {:halt, nil}
-        end
+        {prev, :cont} ->
+          case prev.result do
+            %{"continue" => continue} -> do_stream_get(prev, Map.merge(params, continue))
+            _ -> {:halt, nil}
+          end
       end,
       fn _ -> nil end
     )
   end
 
-  @spec request(Session.t(), :get | :post, Keyword.t()) :: Session.t()
+  defp do_stream_get(session, params) do
+    next = get(session, params)
+    {[next.result], {next, :cont}}
+  end
+
+  @spec request(Session.t(), :get | :post, keyword) :: Session.t()
   defp request(session, method, opts) do
     opts = Keyword.put(opts, :method, method)
 
