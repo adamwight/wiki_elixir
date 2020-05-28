@@ -14,13 +14,16 @@ What it should include:
 * Atoms for selecting the known server-side event streams.
 * ...
 
-## 0.1.3a (TBD)
+## 0.1.4a (TBD)
 
+* ...
+
+## 0.1.3 (May 2020)
+
+* Fix a continuation bug which would drop the first response.
+* Removed the incomplete `Wiki.Rest` client.
 * Some test coverage for `Wiki.Action`.
 * Add lint jobs to git hook and GitLab CI.
-* Removed the incomplete `Wiki.Rest` client.
-* Fix a continuation bug which would drop the first response.
-* ...
 
 ## 0.1.2 (May 2020)
 
@@ -29,6 +32,8 @@ What it should include:
 * Rename WikiSSE -> `Wiki.EventStreams`
 * Basic ORES client.
 * Inline examples as module documentation.
+* Pipe-join list values for Action API.
+* Accumulate Action results.
 
 ## 0.1.1 (May 2020)
 
