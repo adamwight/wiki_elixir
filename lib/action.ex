@@ -9,20 +9,16 @@ defmodule Wiki.Action.Session do
   """
 
   @type client :: Tesla.Client.t()
-  @type cookies :: map
-  @type option :: {:overwrite, true}
-  @type options :: [option]
+  @type options :: keyword
   @type result :: map
 
   @type t :: %__MODULE__{
           __client__: client,
-          __cookies__: cookies,
           opts: options,
           result: result
         }
 
   defstruct __client__: nil,
-            __cookies__: %{},
             opts: [],
             result: %{}
 end
@@ -68,7 +64,7 @@ defmodule Wiki.Action do
   })).()
   |> (&(&1.result)).()
   |> Jason.encode!(pretty: true)
-  |> IO.puts
+  |> IO.puts()
   ```
 
   Streaming results from multiple requests using continuation,
@@ -83,7 +79,7 @@ defmodule Wiki.Action do
   |> Stream.take(10)
   |> Enum.flat_map(fn response -> response["query"]["recentchanges"] end)
   |> Enum.map(fn rc -> rc["timestamp"] <> " " <> rc["title"] end)
-  |> IO.inspect
+  |> IO.inspect()
   ```
   """
 
@@ -215,45 +211,21 @@ defmodule Wiki.Action do
 
   @spec request(Session.t(), :get | :post, keyword) :: Session.t()
   defp request(session, method, opts) do
-    opts = Keyword.put(opts, :method, method)
+    opts = [opts: session.opts] ++ opts ++ [method: method]
 
-    opts =
-      if map_size(session.__cookies__) > 0 do
-        Keyword.put(opts, :headers, [{"cookie", serialize_cookies(session.__cookies__)}])
-      else
-        opts
-      end
-
-    response = Tesla.request!(session.__client__, opts)
-
-    cookie_jar =
-      response.headers
-      |> extract_cookies()
-      |> update_cookies(session.__cookies__)
+    result = Tesla.request!(session.__client__, opts)
 
     %Session{
       __client__: session.__client__,
-      __cookies__: cookie_jar,
-      opts: session.opts,
       result:
-        case Keyword.get(session.opts, :overwrite) do
-          true -> response.body
-          _ -> recursive_merge(session.result, response.body)
-        end
+        if session.opts[:overwrite] do
+          result.body
+        else
+          result.opts[:result]
+        end,
+      opts: result.opts
     }
   end
-
-  @spec recursive_merge(map, map) :: map
-  defp recursive_merge(%{} = v1, %{} = v2), do: Map.merge(v1, v2, &recursive_merge/3)
-
-  @spec recursive_merge(String.t(), map | String.t(), map | String.t()) :: map
-  defp recursive_merge(_key, v1, v2)
-
-  defp recursive_merge(_key, %{} = v1, %{} = v2), do: recursive_merge(v1, v2)
-
-  defp recursive_merge(_key, v1, v2) when is_list(v1) and is_list(v2), do: v1 ++ v2
-
-  defp recursive_merge(_key, v1, v2) when v1 == v2, do: v1
 
   @spec normalize(map) :: map
   defp normalize(params) do
@@ -280,7 +252,65 @@ defmodule Wiki.Action do
 
   defp normalize_value(value), do: value
 
+  @spec client(list) :: Tesla.Client.t()
+  defp client(extra) do
+    middleware =
+      extra ++
+        [
+          {Tesla.Middleware.Compression, format: "gzip"},
+          Wiki.Tesla.Middleware.CookieJar,
+          Tesla.Middleware.FormUrlencoded,
+          {Tesla.Middleware.Headers,
+           [
+             {"user-agent", Application.get_env(:wiki_elixir, :user_agent)}
+           ]},
+          Tesla.Middleware.JSON,
+          Wiki.Tesla.Middleware.CumulativeResult
+          # Debugging only:
+          # Tesla.Middleware.Logger
+        ]
+
+    Tesla.client(middleware)
+  end
+end
+
+defmodule Wiki.Tesla.Middleware.CookieJar do
+  @moduledoc false
+
+  @behaviour Tesla.Middleware
+
+  @impl true
+  def call(env, next, _opts) do
+    cookie_header =
+      case env.opts[:cookies] do
+        nil -> []
+        cookies -> [{"cookie", serialize_cookies(cookies)}]
+      end
+
+    env =
+      env
+      |> Tesla.put_headers(cookie_header)
+
+    with {:ok, env} <- Tesla.run(env, next) do
+      cookies =
+        env
+        |> Tesla.get_headers("set-cookie")
+        |> extract_cookies()
+        |> update_cookies(env.opts[:cookies])
+
+      env =
+        env
+        |> Tesla.put_opt(:cookies, cookies)
+
+      {:ok, env}
+    end
+  end
+
   @spec update_cookies(map, map) :: map
+  defp update_cookies(new_cookies, old_cookies)
+
+  defp update_cookies(new_cookies, nil), do: new_cookies
+
   defp update_cookies(new_cookies, old_cookies) do
     # TODO: Use a library conforming to RFC 6265, for example respecting expiry.
     Map.merge(old_cookies, new_cookies)
@@ -289,28 +319,8 @@ defmodule Wiki.Action do
   @spec extract_cookies(Keyword.t()) :: map
   defp extract_cookies(headers) do
     headers
-    |> get_headers("set-cookie")
-    |> parse_cookies()
-    |> repack_cookies()
-  end
-
-  @spec get_headers(Keyword.t(), String.t()) :: [String.t()]
-  defp get_headers(headers, key) do
-    for {k, v} <- headers, k == key, do: v
-  end
-
-  @spec parse_cookies([String.t()]) :: [map]
-  defp parse_cookies(cookie_headers)
-
-  defp parse_cookies([]), do: []
-
-  defp parse_cookies([header | others]), do: [SetCookie.parse(header) | parse_cookies(others)]
-
-  @spec repack_cookies([map]) :: map
-  defp repack_cookies(cookies) do
-    cookies
-    |> Enum.map(fn %{key: k, value: v} -> {k, v} end)
-    |> Enum.into(%{})
+    |> Enum.map(&SetCookie.parse/1)
+    |> Enum.into(%{}, fn %{key: k, value: v} -> {k, v} end)
   end
 
   @spec serialize_cookies(map) :: String.t()
@@ -319,23 +329,32 @@ defmodule Wiki.Action do
     |> Enum.map(fn {key, value} -> key <> "=" <> value end)
     |> Enum.join("; ")
   end
+end
 
-  @spec client(list) :: Tesla.Client.t()
-  defp client(extra) do
-    middleware =
-      extra ++
-        [
-          {Tesla.Middleware.Compression, format: "gzip"},
-          Tesla.Middleware.FormUrlencoded,
-          {Tesla.Middleware.Headers,
-           [
-             {"user-agent", Application.get_env(:wiki_elixir, :user_agent)}
-           ]},
-          Tesla.Middleware.JSON
-          # Debugging only:
-          # Tesla.Middleware.Logger
-        ]
+defmodule Wiki.Tesla.Middleware.CumulativeResult do
+  @moduledoc false
 
-    Tesla.client(middleware)
+  @behaviour Tesla.Middleware
+
+  @impl true
+  def call(env, next, _opts) do
+    with {:ok, env} <- Tesla.run(env, next) do
+      {:ok,
+       env
+       |> Tesla.put_opt(:result, recursive_merge(env.opts[:result] || %{}, env.body))}
+    end
   end
+
+  @spec recursive_merge(map, map) :: map
+  defp recursive_merge(%{} = v1, %{} = v2), do: Map.merge(v1, v2, &recursive_merge/3)
+
+  # TODO: _key can be dropped
+  @spec recursive_merge(String.t(), map | String.t(), map | String.t()) :: map
+  defp recursive_merge(_key, v1, v2)
+
+  defp recursive_merge(_key, %{} = v1, %{} = v2), do: recursive_merge(v1, v2)
+
+  defp recursive_merge(_key, v1, v2) when is_list(v1) and is_list(v2), do: v1 ++ v2
+
+  defp recursive_merge(_key, v1, v2) when v1 == v2, do: v1
 end

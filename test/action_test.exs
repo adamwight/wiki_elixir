@@ -62,15 +62,17 @@ defmodule ActionTest do
 
     session = %Session{
       session
-      | result: %{
-          "appended" => ["a"],
-          "isolated" => "foo",
-          "query" => %{
-            "statistics" => %{
-              "merged" => true
+      | opts: [
+          result: %{
+            "appended" => ["a"],
+            "isolated" => "foo",
+            "query" => %{
+              "statistics" => %{
+                "merged" => true
+              }
             }
           }
-        }
+        ]
     }
 
     session =
@@ -139,13 +141,18 @@ defmodule ActionTest do
     session = Action.new("https://dewiki.test/w/api.php")
 
     session =
-      %{session | __cookies__: %{"a" => "b"}}
+      %Session{
+        session
+        | opts: [
+            cookies: %{"a" => "b"}
+          ]
+      }
       |> Wiki.Action.authenticate(
         "TestUser@bot",
         "botpass"
       )
 
-    assert session.__cookies__ == %{"mediawiki_session" => "new_cookie", "a" => "b"}
+    assert session.opts[:cookies] == %{"mediawiki_session" => "new_cookie", "a" => "b"}
   end
 
   test "streams continuations" do
