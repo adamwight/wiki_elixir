@@ -16,24 +16,61 @@ defmodule ActionTest do
     assert length(client.pre) >= 1
   end
 
-  test "gets successfully, merges previous results if enabled" do
+  test "gets successfully" do
     canned_response = %{
       "batchcomplete" => "",
       "query" => %{
         "general" => %{
           "mainpage" => "Main Page"
         },
+      },
+    }
+
+    # FIXME: Why isn't JSON middleware decoding during testing?
+    # |> Jason.encode!()
+
+    TeslaAdapterMock
+    |> expect(:call, fn env, _opts ->
+      [{"user-agent", user_agent}] = env.headers
+
+      assert String.match?(user_agent, ~r/wiki_elixir.*\d.*/)
+      assert env.method == :get
+
+      assert env.query == [
+               action: :query,
+               format: :json,
+               meta: :siteinfo,
+               siprop: :general
+             ]
+
+      {:ok, %Env{env | body: canned_response, headers: [], status: 200}}
+    end)
+
+    session =
+      Action.new(
+        "https://dewiki.test/w/api.php",
+        [Wiki.Tesla.Middleware.CumulativeResult]
+      )
+      |> Action.get(%{
+        action: :query,
+        format: :json,
+        meta: :siteinfo,
+        siprop: :general
+      })
+
+    assert session.result["query"]["general"]["mainpage"] == "Main Page"
+  end
+
+  test "merges previous results" do
+    canned_response = %{
+      "batchcomplete" => "",
+      "query" => %{
+        "general" => %{
+          "mainpage" => "Main Page",
+        },
         "statistics" => %{
           "activeusers" => 20_132,
-          "admins" => 193,
-          "articles" => 2_435_513,
-          "edits" => 198_804_009,
-          "images" => 129_180,
-          "jobs" => 0,
-          "pages" => 6_806_338,
-          "queued-massmessages" => 0,
-          "users" => 3_469_437
-        }
+        },
       },
       "appended" => ["b"]
     }
@@ -71,6 +108,9 @@ defmodule ActionTest do
             "appended" => ["a"],
             "isolated" => "foo",
             "query" => %{
+              "general" => %{
+                "mainpage" => "Main Page"
+              },
               "statistics" => %{
                 "merged" => true
               }
