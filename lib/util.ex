@@ -14,7 +14,7 @@ defmodule Wiki.Util do
     Application.get_env(
       :wiki_elixir,
       :user_agent,
-      "wiki_elixir/0.1.4 (spam@ludd.net)"
+      "wiki_elixir/0.1.5 (spam@ludd.net)"
     )
   end
 end
