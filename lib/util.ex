@@ -10,9 +10,11 @@ defmodule Wiki.Util do
   @doc false
   @spec user_agent() :: String.t()
   def user_agent do
+    # TODO: Is there a way to use Elixir.MixProject.project()[:version]?
     Application.get_env(
       :wiki_elixir,
       :user_agent,
-      "wiki_elixir/" <> Elixir.MixProject.project()[:version] <> " (spam@ludd.net)")
+      "wiki_elixir/0.1.4 (spam@ludd.net)"
+    )
   end
 end
