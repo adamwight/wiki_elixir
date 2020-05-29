@@ -5,22 +5,22 @@ defmodule Wiki.Action.Session do
   ## Fields
 
   - `result` - Map with recursively merged values from all requests made using this session.
-  - `opts` - Keyword list with options to change behavior.
+  - `state` - Cache for session state and accumulation.
   """
 
   @type client :: Tesla.Client.t()
-  @type options :: keyword
   @type result :: map
+  @type state :: keyword
 
   @type t :: %__MODULE__{
           __client__: client,
-          opts: options,
-          result: result
+          result: result,
+          state: keyword
         }
 
   defstruct __client__: nil,
-            opts: [],
-            result: %{}
+            result: %{},
+            state: []
 end
 
 defmodule Wiki.Action do
@@ -44,7 +44,10 @@ defmodule Wiki.Action do
   delegated by supplying a [bot password](https://www.mediawiki.org/wiki/Manual:Bot_passwords).
 
   ```elixir
-  Wiki.Action.new("https://en.wikipedia.org/w/api.php")
+  Wiki.Action.new(
+    "https://en.wikipedia.org/w/api.php",
+    [Wiki.Tesla.Middleware.CumulativeResult]
+  )
   |> Wiki.Action.authenticate(
     Application.get_env(:example_app, :bot_username),
     Application.get_env(:example_app, :bot_password)
@@ -91,20 +94,18 @@ defmodule Wiki.Action do
   ## Arguments
 
   - `url` - `api.php` endpoint for the wiki you will connect to.  For example, "https://en.wikipedia.org/w/api.php".
-  - `opts` - Client configuration options,
-    - `{:overwrite, true}` - When set, the results won't accumulate, instead they will reset and
-    `session.result` will only reflect the output of the latest request in a chain.  This is
-    required when following continuations using the same session object, and will be automatically
-    enabled when using `Wiki.Action.stream`.
+  - `middleware` - Any additional modules to include, such as Wiki.Tesla.Middleware.CumulativeResult
   """
-  @spec new(String.t(), Session.options()) :: Session.t()
-  def new(url, opts \\ []) do
+  @spec new(String.t(), list) :: Session.t()
+  def new(url, middleware \\ []) do
     %Session{
       __client__:
-        client([
-          {Tesla.Middleware.BaseUrl, url}
-        ]),
-      opts: opts
+        client(
+          middleware ++
+            [
+              {Tesla.Middleware.BaseUrl, url}
+            ]
+        )
     }
   end
 
@@ -146,13 +147,15 @@ defmodule Wiki.Action do
 
   - `session` - `Wiki.Action.Session` object.
   - `params` - Map of query parameters as atoms or strings.
+  - `opts` - Options to pass to the adapter.
 
   ## Return value
 
   Session object with its `.result` populated.
   """
-  @spec get(Session.t(), map) :: Session.t()
-  def get(session, params), do: request(session, :get, query: Map.to_list(normalize(params)))
+  @spec get(Session.t(), map, keyword) :: Session.t()
+  def get(session, params, opts \\ []),
+    do: request(session, :get, opts ++ [query: Map.to_list(normalize(params))])
 
   @doc """
   Make an API POST request.
@@ -162,13 +165,15 @@ defmodule Wiki.Action do
   - `session` - `Wiki.Action.Session` object.  If credentials are required for this
   action, you should have created this object with the `authenticate/3` function.
   - `params` - Map of query parameters as atoms or strings.
+  - `opts` - Options to pass to the adapter.
 
   ## Return value
 
   Session object with a populated `:result` attribute.
   """
-  @spec post(Session.t(), map) :: Session.t()
-  def post(session, params), do: request(session, :post, body: normalize(params))
+  @spec post(Session.t(), map, keyword) :: Session.t()
+  def post(session, params, opts \\ []),
+    do: request(session, :post, opts ++ [body: normalize(params)])
 
   @doc """
   Make a GET request and follow continuations until exhausted or the stream is closed.
@@ -186,10 +191,8 @@ defmodule Wiki.Action do
   """
   @spec stream(Session.t(), map) :: Enumerable.t()
   def stream(session, params) do
-    session1 = %Session{session | opts: Keyword.put_new(session.opts, :overwrite, true)}
-
     Stream.resource(
-      fn -> {session1, :start} end,
+      fn -> {session, :start} end,
       fn
         {prev, :start} ->
           do_stream_get(prev, params)
@@ -211,19 +214,15 @@ defmodule Wiki.Action do
 
   @spec request(Session.t(), :get | :post, keyword) :: Session.t()
   defp request(session, method, opts) do
-    opts = [opts: session.opts] ++ opts ++ [method: method]
+    # TODO: This can be extracted into a generic StatefulAdapter now.
+    opts = [opts: session.state] ++ opts ++ [method: method]
 
     result = Tesla.request!(session.__client__, opts)
 
     %Session{
       __client__: session.__client__,
-      result:
-        if session.opts[:overwrite] do
-          result.body
-        else
-          result.opts[:result]
-        end,
-      opts: result.opts
+      result: result.body,
+      state: Keyword.delete(result.opts, :opts)
     }
   end
 
@@ -264,8 +263,7 @@ defmodule Wiki.Action do
            [
              {"user-agent", Util.user_agent()}
            ]},
-          Tesla.Middleware.JSON,
-          Wiki.Tesla.Middleware.CumulativeResult
+          Tesla.Middleware.JSON
           # Debugging only:
           # Tesla.Middleware.Logger
         ]
@@ -274,6 +272,7 @@ defmodule Wiki.Action do
   end
 end
 
+# Note: Relies on local request wrapper to propagate state.
 defmodule Wiki.Tesla.Middleware.CookieJar do
   @moduledoc false
 
@@ -331,6 +330,7 @@ defmodule Wiki.Tesla.Middleware.CookieJar do
   end
 end
 
+# Note: Relies on local request wrapper to propagate state.
 defmodule Wiki.Tesla.Middleware.CumulativeResult do
   @moduledoc false
 
@@ -339,9 +339,11 @@ defmodule Wiki.Tesla.Middleware.CumulativeResult do
   @impl true
   def call(env, next, _opts) do
     with {:ok, env} <- Tesla.run(env, next) do
+      accumulated = recursive_merge(env.opts[:accumulated_result] || %{}, env.body)
+
       {:ok,
-       env
-       |> Tesla.put_opt(:result, recursive_merge(env.opts[:result] || %{}, env.body))}
+       Tesla.put_opt(env, :accumulated_result, accumulated)
+       |> Tesla.put_body(accumulated)}
     end
   end
 

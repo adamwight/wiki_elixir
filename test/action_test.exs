@@ -16,7 +16,7 @@ defmodule ActionTest do
     assert length(client.pre) >= 1
   end
 
-  test "gets successfully" do
+  test "gets successfully, merges previous results if enabled" do
     canned_response = %{
       "batchcomplete" => "",
       "query" => %{
@@ -58,12 +58,16 @@ defmodule ActionTest do
       {:ok, %Env{env | body: canned_response, headers: [], status: 200}}
     end)
 
-    session = Action.new("https://dewiki.test/w/api.php")
+    session =
+      Action.new(
+        "https://dewiki.test/w/api.php",
+        [Wiki.Tesla.Middleware.CumulativeResult]
+      )
 
     session = %Session{
       session
-      | opts: [
-          result: %{
+      | state: [
+          accumulated_result: %{
             "appended" => ["a"],
             "isolated" => "foo",
             "query" => %{
@@ -143,7 +147,7 @@ defmodule ActionTest do
     session =
       %Session{
         session
-        | opts: [
+        | state: [
             cookies: %{"a" => "b"}
           ]
       }
@@ -152,7 +156,7 @@ defmodule ActionTest do
         "botpass"
       )
 
-    assert session.opts[:cookies] == %{"mediawiki_session" => "new_cookie", "a" => "b"}
+    assert session.state[:cookies] == %{"mediawiki_session" => "new_cookie", "a" => "b"}
   end
 
   test "streams continuations" do
