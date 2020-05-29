@@ -1,8 +1,6 @@
 # Wiki Elixir
 
-This project provides unofficial Elixir client modules for Wikipedia and other MediaWiki sites.
-
-[![pipeline status](https://gitlab.com/adamwight/wiki_elixir/badges/master/pipeline.svg)](https://gitlab.com/adamwight/wiki_elixir/-/commits/master) [![coverage report](https://gitlab.com/adamwight/wiki_elixir/badges/master/coverage.svg)](https://gitlab.com/adamwight/wiki_elixir/-/commits/master)
+Unofficial Elixir client modules for Wikipedia and other MediaWiki sites.
 
 Currently supported,
 * `Wiki.Action` to access the [Action API](https://www.mediawiki.org/wiki/Special:MyLanguage/API:Main_page).
