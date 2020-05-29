@@ -51,6 +51,7 @@ defmodule Wiki.EventStreams do
     end
 
     @impl true
+    @spec init(any) :: {:producer, state}
     def init(_) do
       {:producer, {:queue.new(), 0}}
     end
@@ -70,6 +71,7 @@ defmodule Wiki.EventStreams do
       dispatch_events(queue, demand + pending_demand)
     end
 
+    @spec dispatch_events(:queue.queue(), integer) :: reply
     defp dispatch_events(queue, demand) do
       available = min(demand, :queue.len(queue))
       {retrieved, queue1} = :queue.split(available, queue)
@@ -94,6 +96,7 @@ defmodule Wiki.EventStreams do
       headers = [
         {"user-agent", Util.user_agent()}
       ]
+
       %{
         id: Source,
         # FIXME: nicer if we could get the Relay sibling's specific PID each time,
@@ -170,6 +173,7 @@ defmodule Wiki.EventStreams do
   end
 
   @doc false
+  @spec default_endpoint() :: String.t()
   def default_endpoint do
     "https://stream.wikimedia.org/v2/stream/"
   end
