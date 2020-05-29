@@ -6,21 +6,18 @@ defmodule Elixir.MixProject do
       app: :wiki_elixir,
       version: "0.1.4",
       elixir: "~> 1.8",
-      elixirc_paths: ["lib", "contrib"],
+      elixirc_paths: ~w(lib contrib),
       start_permanent: Mix.env() == :prod,
       description: description(),
       deps: deps(),
       package: package(),
       source_url: "https://gitlab.com/adamwight/wiki_elixir",
       dialyzer: [
-        plt_add_apps: [:cookie, :gen_stage, :jason, :tesla],
+        plt_add_apps: ~w(cookie gen_stage jason tesla)a,
         plt_core_path: "priv/plts/"
       ],
       docs: [
-        extras: [
-          "CHANGELOG.md",
-          "README.md"
-        ],
+        extras: ~w(CHANGELOG.md README.md),
         main: "readme"
       ],
       preferred_cli_env: [coveralls: :test],
