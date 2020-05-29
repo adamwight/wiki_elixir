@@ -59,6 +59,7 @@ defmodule Elixir.MixProject do
 
   defp package do
     [
+      files: ~w(.formatter.exs contrib lib mix.exs *.md),
       name: :wiki_elixir,
       maintainers: ["adamwight"],
       licenses: ["GPLv3"],
