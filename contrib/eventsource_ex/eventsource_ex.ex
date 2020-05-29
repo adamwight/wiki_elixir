@@ -15,21 +15,22 @@ defmodule EventsourceEx do
 
   defp parse_options(opts) do
     url = opts[:url]
-    headers = opts[:headers]
+    headers = opts[:headers] || []
     parent = opts[:stream_to]
+    adapter = opts[:adapter] || HTTPoison
     follow_redirect = opts[:follow_redirect]
     hackney_opts = opts[:hackney]
     ssl = opts[:ssl]
     http_options = [stream_to: self(), ssl: ssl, follow_redirect: follow_redirect,
                                   hackney: hackney_opts, recv_timeout: :infinity]
 
-    {url, headers, parent, Enum.filter(http_options, fn({_,val}) -> val != nil end)}
+    {url, headers, parent, adapter, Enum.filter(http_options, fn({_,val}) -> val != nil end)}
   end
     
   def init(opts \\ []) do
-    {url, headers, parent, options} = parse_options(opts)
+    {url, headers, parent, adapter, options} = parse_options(opts)
     Logger.debug(fn -> "starting stream with http options: #{inspect options}" end)
-    HTTPoison.get!(url, headers, options)
+    adapter.get!(url, headers, options)
 
     {:ok, %{parent: parent, message: %EventsourceEx.Message{}, prev_chunk: nil}}
   end
