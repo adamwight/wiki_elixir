@@ -17,17 +17,16 @@ defmodule ActionTest do
   end
 
   test "gets successfully" do
-    canned_response = %{
-      "batchcomplete" => "",
-      "query" => %{
-        "general" => %{
-          "mainpage" => "Main Page"
-        },
-      },
-    }
-
-    # FIXME: Why isn't JSON middleware decoding during testing?
-    # |> Jason.encode!()
+    canned_response =
+      %{
+        "batchcomplete" => "",
+        "query" => %{
+          "general" => %{
+            "mainpage" => "Main Page"
+          }
+        }
+      }
+      |> Jason.encode!()
 
     TeslaAdapterMock
     |> expect(:call, fn env, _opts ->
@@ -43,7 +42,9 @@ defmodule ActionTest do
                siprop: :general
              ]
 
-      {:ok, %Env{env | body: canned_response, headers: [], status: 200}}
+      headers = [{"content-type", "application/json; charset=utf-8"}]
+
+      {:ok, %Env{env | body: canned_response, headers: headers, status: 200}}
     end)
 
     session =
@@ -66,17 +67,14 @@ defmodule ActionTest do
       "batchcomplete" => "",
       "query" => %{
         "general" => %{
-          "mainpage" => "Main Page",
+          "mainpage" => "Main Page"
         },
         "statistics" => %{
-          "activeusers" => 20_132,
-        },
+          "activeusers" => 20_132
+        }
       },
       "appended" => ["b"]
     }
-
-    # FIXME: Why isn't JSON middleware decoding during testing?
-    # |> Jason.encode!()
 
     TeslaAdapterMock
     |> expect(:call, fn env, _opts ->
