@@ -45,7 +45,7 @@ defmodule ActionTest do
     |> expect(:call, fn env, _opts ->
       [{"user-agent", user_agent}] = env.headers
 
-      assert String.match?(user_agent, ~r/wiki_elixir/)
+      assert String.match?(user_agent, ~r/wiki_elixir.*\d.*/)
       assert env.method == :get
 
       assert env.query == [

@@ -87,13 +87,18 @@ defmodule Wiki.EventStreams do
   defmodule Source do
     @moduledoc false
 
+    alias Wiki.Util
+
     @spec child_spec(String.t()) :: map
     def child_spec(endpoint) do
+      headers = [
+        {"user-agent", Util.user_agent()}
+      ]
       %{
         id: Source,
         # FIXME: nicer if we could get the Relay sibling's specific PID each time,
         #  to allow an app to use multiple stream listeners.
-        start: {EventsourceEx, :new, [endpoint, [headers: [], stream_to: Relay]]}
+        start: {EventsourceEx, :new, [endpoint, [headers: headers, stream_to: Relay]]}
       }
     end
   end
@@ -103,9 +108,11 @@ defmodule Wiki.EventStreams do
 
     use Supervisor, restart: :permanent
 
+    alias Wiki.EventStreams
+
     @spec start_link(keyword) :: GenServer.on_start()
     def start_link(args) do
-      endpoint = args[:endpoint] || default_endpoint()
+      endpoint = args[:endpoint] || EventStreams.default_endpoint()
       url = endpoint <> normalize_streams(args[:streams])
       sink = args[:send_to] || self()
 
@@ -120,11 +127,6 @@ defmodule Wiki.EventStreams do
     @impl true
     def init(args) do
       {:ok, args}
-    end
-
-    # FIXME: Define in top-level module--why does this make it inaccessible here?
-    defp default_endpoint do
-      Application.get_env(:wiki_elixir, :eventstreams_base)
     end
 
     @spec normalize_streams(atom | [atom]) :: atom | String.t()
@@ -165,5 +167,10 @@ defmodule Wiki.EventStreams do
   @spec stream(keyword) :: Enumerable.t()
   def stream(options \\ []) do
     GenStage.stream([Relay], options)
+  end
+
+  @doc false
+  def default_endpoint do
+    "https://stream.wikimedia.org/v2/stream/"
   end
 end

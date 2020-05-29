@@ -40,15 +40,14 @@ defmodule Wiki.Action do
   |> IO.inspect()
   ```
 
-  Commands can be pipelined to accumulate results and to hold authentication cookies,
+  Commands can be pipelined to accumulate results, and logged-in user permissions
+  delegated by supplying a [bot password](https://www.mediawiki.org/wiki/Manual:Bot_passwords).
 
   ```elixir
-  Wiki.Action.new(
-    Application.get_env(:wiki_elixir, :default_site_api)
-  )
+  Wiki.Action.new("https://en.wikipedia.org/w/api.php")
   |> Wiki.Action.authenticate(
-    Application.get_env(:wiki_elixir, :username),
-    Application.get_env(:wiki_elixir, :password)
+    Application.get_env(:example_app, :bot_username),
+    Application.get_env(:example_app, :bot_password)
   )
   |> Wiki.Action.get(%{
     action: :query,
@@ -84,6 +83,7 @@ defmodule Wiki.Action do
   """
 
   alias Wiki.Action.Session
+  alias Wiki.Util
 
   @doc """
   Create a new client session
@@ -262,7 +262,7 @@ defmodule Wiki.Action do
           Tesla.Middleware.FormUrlencoded,
           {Tesla.Middleware.Headers,
            [
-             {"user-agent", Application.get_env(:wiki_elixir, :user_agent)}
+             {"user-agent", Util.user_agent()}
            ]},
           Tesla.Middleware.JSON,
           Wiki.Tesla.Middleware.CumulativeResult
@@ -270,7 +270,7 @@ defmodule Wiki.Action do
           # Tesla.Middleware.Logger
         ]
 
-    Tesla.client(middleware)
+    Tesla.client(middleware, Util.default_adapter())
   end
 end
 

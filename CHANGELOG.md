@@ -16,6 +16,7 @@ What it should include:
 
 ## 0.1.4a (TBD)
 
+* Fix application configuration bug, nothing worked out of the box.
 * ...
 
 ## 0.1.3 (May 2020)

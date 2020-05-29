@@ -15,6 +15,8 @@ defmodule Wiki.Ores do
   ```
   """
 
+  alias Wiki.Util
+
   # TODO:
   #  * Wrap models?
   #  * Chunk at 50 revisions per request.
@@ -33,11 +35,15 @@ defmodule Wiki.Ores do
   """
   @spec new(String.t()) :: Tesla.Client.t()
   def new(project) do
-    url = Application.get_env(:wiki_elixir, :ores) <> project <> "/"
+    url = endpoint() <> project <> "/"
 
     client([
       {Tesla.Middleware.BaseUrl, url}
     ])
+  end
+
+  defp endpoint do
+    Application.get_env(:wiki_elixir, :ores_endpoint, "https://ores.wikimedia.org/v3/scores/")
   end
 
   @doc """
@@ -84,13 +90,13 @@ defmodule Wiki.Ores do
           {Tesla.Middleware.Compression, format: "gzip"},
           {Tesla.Middleware.Headers,
            [
-             {"user-agent", Application.get_env(:wiki_elixir, :user_agent)}
+             {"user-agent", Util.user_agent()}
            ]},
           Tesla.Middleware.JSON
           # Debugging only:
           # Tesla.Middleware.Logger
         ]
 
-    Tesla.client(middleware)
+    Tesla.client(middleware, Util.default_adapter())
   end
 end

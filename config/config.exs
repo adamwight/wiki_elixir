@@ -2,21 +2,6 @@
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
-config :wiki_elixir,
-  user_agent: "wiki_elixir/0.1.4 (spam@ludd.net)",
-  ores: "https://ores.wikimedia.org/v3/scores/",
-  wikimedia_org: "https://wikimedia.org/api/rest_v1",
-  eventstreams_base: "https://stream.wikimedia.org/v2/stream/",
-
-  # FIXME: per-wiki
-  default_site_api: "https://en.wikipedia.org/w/api.php",
-  username: "bot_username",
-  password: "bot_password"
-
-# FIXME: Configure in a way that's easier to override from calling applications?
-config :tesla,
-  adapter: Tesla.Adapter.Hackney
-
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this
 # file won't be loaded nor affect the parent project. For this reason,

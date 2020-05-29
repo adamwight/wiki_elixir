@@ -1,4 +1,4 @@
 import Config
 
-config :tesla,
-  adapter: Wiki.Tests.TeslaAdapterMock
+config :wiki_elixir,
+  tesla_adapter: Wiki.Tests.TeslaAdapterMock
