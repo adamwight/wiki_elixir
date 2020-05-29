@@ -48,8 +48,7 @@ defmodule Elixir.MixProject do
       {:httpoison, "~> 1.0"},
       {:jason, "~> 1.0"},
       {:mox, "~> 0.5", only: :test},
-      {:tesla, "~> 1.0"},
-      {:timex, "~> 3.0"}
+      {:tesla, "~> 1.0"}
     ]
   end
 
