@@ -2,7 +2,7 @@
 
 ## 0.3.0-TODO
 
-Distant future, don't attempt in v0.2:
+Distant future, won't attempt in v0.2:
 * Detect Wikimedia site matrix.
 * Discover APIs (and warn that this should be configured?  cache?), generate matching client.
 
@@ -11,20 +11,24 @@ Distant future, don't attempt in v0.2:
 What it should include:
 * Test everything critical.
 * Detect server and network errors, fail fast.
-* Atoms for selecting the known server-side event streams.
+* Atoms for selecting the known server-side event streams?
 * ...
 
-## 0.1.4a (TBD)
+## 0.1.5a (TBD)
+
+* ...
+
+## 0.1.4 (May 2020)
 
 * Fix application configuration bug, nothing worked out of the box.
-* ...
-
-## 0.1.3 (May 2020)
-
 * Fix a continuation bug which would drop the first response.
 * Removed the incomplete `Wiki.Rest` client.
 * Some test coverage for `Wiki.Action`.
 * Add lint jobs to git hook and GitLab CI.
+
+## 0.1.3 (May 2020)
+
+* (broken release)
 
 ## 0.1.2 (May 2020)
 
