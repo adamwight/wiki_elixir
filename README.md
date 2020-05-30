@@ -48,16 +48,18 @@ Wiki.Action.new("https://de.wikipedia.org/w/api.php")
 |> IO.inspect()
 ```
 
-See each module for more detailed examples.
+See the module documentation for detailed usage and more examples.
 
-The `:format` parameter always defaults to `:json` unless overridden.
+The `:format` parameter defaults to `:json` and can be omitted unless you mean to
+override the returned format.
 
 ## Development
 
-The project's homepage is currently [on GitLab](https://gitlab.com/adamwight/wiki_elixir).
+The [project's homepage](https://gitlab.com/adamwight/wiki_elixir) is currently on GitLab.
 To contribute, please submit an issue or a merge request.
 
-The easiest way to run linters is to install the pre-push git hook using,
+Several linters are configured, the easiest way to use them is to install the
+pre-push git hook using,
 
 ```shell script
 mix git_hooks.install
