@@ -9,13 +9,13 @@ Distant future, won't attempt in v0.2:
 ## 0.2.0-TODO
 
 What it should include:
-* Test everything critical.
 * Detect server and network errors, fail fast.
 * Atoms for selecting the known server-side event streams?
 * ...
 
 ## 0.1.5a (TBD)
 
+* Test everything.
 * ...
 
 ## 0.1.4 (May 2020)
