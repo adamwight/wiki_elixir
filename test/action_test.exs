@@ -52,12 +52,12 @@ defmodule ActionTest do
         "https://dewiki.test/w/api.php",
         [Wiki.Tesla.Middleware.CumulativeResult]
       )
-      |> Action.get(%{
+      |> Action.get(
         action: :query,
         format: :json,
         meta: :siteinfo,
         siprop: :general
-      })
+      )
 
     assert session.result["query"]["general"]["mainpage"] == "Main Page"
   end
@@ -119,12 +119,12 @@ defmodule ActionTest do
 
     session =
       session
-      |> Action.get(%{
+      |> Action.get(
         action: :query,
         format: :json,
         meta: :siteinfo,
         siprop: [:general, :statistics]
-      })
+      )
 
     assert session.result["appended"] == ["a", "b"]
     assert session.result["isolated"] == "foo"
@@ -244,11 +244,11 @@ defmodule ActionTest do
 
     recent_changes =
       Action.new("https://dewiki.test/w/api.php")
-      |> Action.stream(%{
+      |> Action.stream(
         action: :query,
         list: :recentchanges,
         rclimit: 2
-      })
+      )
       |> Enum.flat_map(fn response -> response["query"]["recentchanges"] end)
       |> Enum.map(fn rc -> rc["revid"] end)
 

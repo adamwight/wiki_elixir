@@ -31,11 +31,11 @@ defmodule Wiki.Action do
 
   ```elixir
   Wiki.Action.new("https://de.wikipedia.org/w/api.php")
-  |> Wiki.Action.get(%{
+  |> Wiki.Action.get(
     action: :query,
     meta: :siteinfo,
     siprop: :statistics
-  })
+  )
   |> (&(&1.result)).()
   |> IO.inspect()
   ```
@@ -52,18 +52,18 @@ defmodule Wiki.Action do
     Application.get_env(:example_app, :bot_username),
     Application.get_env(:example_app, :bot_password)
   )
-  |> Wiki.Action.get(%{
+  |> Wiki.Action.get(
     action: :query,
     meta: :tokens,
     type: :csrf
-  })
-  |> (&Wiki.Action.post(&1, %{
+  )
+  |> (&Wiki.Action.post(&1, [{
     action: :edit,
     title: "Sandbox",
     assert: :user,
     token: &1.result["query"]["tokens"]["csrftoken"],
     appendtext: "~~~~ was here."
-  })).()
+  ])).()
   |> (&(&1.result)).()
   |> Jason.encode!(pretty: true)
   |> IO.puts()
@@ -73,11 +73,11 @@ defmodule Wiki.Action do
 
   ```elixir
   Wiki.Action.new("https://de.wikipedia.org/w/api.php")
-  |> Wiki.Action.stream(%{
+  |> Wiki.Action.stream(
     action: :query,
     list: :recentchanges,
     rclimit: 5
-  })
+  )
   |> Stream.take(10)
   |> Enum.flat_map(fn response -> response["query"]["recentchanges"] end)
   |> Enum.map(fn rc -> rc["timestamp"] <> " " <> rc["title"] end)
@@ -127,17 +127,17 @@ defmodule Wiki.Action do
   @spec authenticate(Session.t(), String.t(), String.t()) :: Session.t()
   def authenticate(session, username, password) do
     session
-    |> get(%{
+    |> get(
       action: :query,
       meta: :tokens,
       type: :login
-    })
-    |> (&post(&1, %{
+    )
+    |> (&post(&1,
           action: :login,
           lgname: username,
           lgpassword: password,
           lgtoken: &1.result["query"]["tokens"]["logintoken"]
-        })).()
+        )).()
   end
 
   @doc """
@@ -146,16 +146,16 @@ defmodule Wiki.Action do
   ## Arguments
 
   - `session` - `Wiki.Action.Session` object.
-  - `params` - Map of query parameters as atoms or strings.
+  - `params` - Keyword list of query parameters as atoms or strings.
   - `opts` - Options to pass to the adapter.
 
   ## Return value
 
   Session object with its `.result` populated.
   """
-  @spec get(Session.t(), map, keyword) :: Session.t()
+  @spec get(Session.t(), keyword, keyword) :: Session.t()
   def get(session, params, opts \\ []),
-    do: request(session, :get, opts ++ [query: Map.to_list(normalize(params))])
+    do: request(session, :get, opts ++ [query: normalize_params(params)])
 
   @doc """
   Make an API POST request.
@@ -164,16 +164,16 @@ defmodule Wiki.Action do
 
   - `session` - `Wiki.Action.Session` object.  If credentials are required for this
   action, you should have created this object with the `authenticate/3` function.
-  - `params` - Map of query parameters as atoms or strings.
+  - `params` - Keyword list of query parameters as atoms or strings.
   - `opts` - Options to pass to the adapter.
 
   ## Return value
 
   Session object with a populated `:result` attribute.
   """
-  @spec post(Session.t(), map, keyword) :: Session.t()
+  @spec post(Session.t(), keyword, keyword) :: Session.t()
   def post(session, params, opts \\ []),
-    do: request(session, :post, opts ++ [body: normalize(params)])
+    do: request(session, :post, opts ++ [body: normalize_params(params)])
 
   @doc """
   Make a GET request and follow continuations until exhausted or the stream is closed.
@@ -181,7 +181,7 @@ defmodule Wiki.Action do
   ## Arguments
 
   - `session` - `Wiki.Action.Session` object.
-  - `params` - Map of query parameters as atoms or strings.
+  - `params` - Keyword list of query parameters as atoms or strings.
 
   ## Return value
 
@@ -189,7 +189,7 @@ defmodule Wiki.Action do
   containing multiple records.  This corresponds to `session.result` from the other
   entry points.
   """
-  @spec stream(Session.t(), map) :: Enumerable.t()
+  @spec stream(Session.t(), keyword) :: Enumerable.t()
   def stream(session, params) do
     Stream.resource(
       fn -> {session, :start} end,
@@ -199,7 +199,7 @@ defmodule Wiki.Action do
 
         {prev, :cont} ->
           case prev.result do
-            %{"continue" => continue} -> do_stream_get(prev, Map.merge(params, continue))
+            %{"continue" => continue} -> do_stream_get(prev, params ++ Map.to_list(continue))
             _ -> {:halt, nil}
           end
       end,
@@ -226,30 +226,27 @@ defmodule Wiki.Action do
     }
   end
 
-  @spec normalize(map) :: map
-  defp normalize(params) do
+  @spec normalize_params(keyword) :: keyword
+  defp normalize_params(params) do
+    ([format: :json] ++ params)
+    |> remove_boolean_false()
+    |> pipe_lists()
+    |> Enum.sort()
+    |> Enum.dedup()
+  end
+
+  defp remove_boolean_false(params) do
     params
-    |> defaults()
-    # Remove boolean false values entirely.
     |> Enum.filter(fn {_, v} -> v != false end)
-    # Pipe-separated lists.
-    |> Enum.map(fn {k, v} -> {k, normalize_value(v)} end)
-    # Transform back into a map.
-    |> Enum.into(%{})
   end
 
-  @spec defaults(map) :: map
-  defp defaults(params) do
-    format = Map.get(params, :format, :json)
-    Map.merge(params, %{format: format})
+  defp pipe_lists(params) do
+    params
+    |> Enum.map(fn
+      {k, v} when is_list(v) -> {k, Enum.join(v, "|")}
+      entry -> entry
+    end)
   end
-
-  @spec normalize_value(term) :: String.t()
-  defp normalize_value(value)
-
-  defp normalize_value(value) when is_list(value), do: Enum.join(value, "|")
-
-  defp normalize_value(value), do: value
 
   @spec client(list) :: Tesla.Client.t()
   defp client(extra) do

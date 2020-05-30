@@ -39,11 +39,11 @@ A simple call to the action API,
 
 ```elixir
 Wiki.Action.new("https://de.wikipedia.org/w/api.php")
-|> Wiki.Action.get(%{
+|> Wiki.Action.get(
   action: :query,
   meta: :siteinfo,
   siprop: :statistics
-})
+)
 |> (&(&1.result)).()
 |> IO.inspect()
 ```
