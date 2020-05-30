@@ -29,6 +29,7 @@ defmodule EventStreamsTest do
       |> Enum.map(&send(target, %{chunk: &1}))
     end)
 
+    # FIXME: Need to kill this process at the end of the test.
     EventStreams.start_link(streams: ~w(revision-create revision-score))
 
     result =
@@ -40,5 +41,18 @@ defmodule EventStreamsTest do
              "/* wbeditentity-create-item:0| */ #quickstatements",
              "Автоматическое создание страницы."
            ]
+  end
+
+  test "handles single stream" do
+    HTTPoisonMock
+    |> expect(:get!, fn url, _headers, _options ->
+      assert url == "https://stream.wikimedia.org/v2/stream/revision-create"
+    end)
+
+    # FIXME: Need to kill this process at the end of the test.
+    EventStreams.start_link(streams: "revision-create")
+
+    EventStreams.stream()
+    |> Stream.take(1)
   end
 end
