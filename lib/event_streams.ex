@@ -59,10 +59,11 @@ defmodule Wiki.EventStreams do
     @impl true
     @spec handle_info(EventsourceEx.Message.t(), state) :: reply
     def handle_info(message, {queue, pending_demand}) do
-      event = decode_message_data(message)
-      queue1 = :queue.in(event, queue)
+      message
+      |> decode_message_data()
+      |> :queue.in(queue)
       # FIXME: Suppress reply until above min_demand or periodic timeout has elapsed.
-      dispatch_events(queue1, pending_demand)
+      |> dispatch_events(pending_demand)
     end
 
     @impl true
