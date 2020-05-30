@@ -101,7 +101,18 @@ defmodule Wiki.EventStreams do
         id: Source,
         # FIXME: nicer if we could get the Relay sibling's specific PID each time,
         #  to allow an app to use multiple stream listeners.
-        start: {EventsourceEx, :new, [endpoint, [headers: headers, stream_to: Relay]]}
+        start: {
+          EventsourceEx,
+          :new,
+          [
+            endpoint,
+            [
+              adapter: Application.get_env(:wiki_elixir, :eventsource_adapter),
+              headers: headers,
+              stream_to: Relay
+            ]
+          ]
+        }
       }
     end
   end
