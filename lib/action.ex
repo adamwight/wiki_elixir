@@ -223,6 +223,8 @@ defmodule Wiki.Action do
 
     result = Tesla.request!(session.__client__, opts)
 
+    assert_success(result)
+
     %Session{
       __client__: session.__client__,
       result: result.body,
@@ -264,6 +266,41 @@ defmodule Wiki.Action do
       Enum.join([""] ++ values, unit_separator)
     else
       Enum.join(values, "|")
+    end
+  end
+
+  defp assert_success(result) do
+    cond do
+      result.status < 200 or result.status >= 300 ->
+        raise "Error received with HTTP status #{result.status}"
+
+      result.body in [nil, "", %{}] ->
+        raise "Empty response"
+
+      result.body["error"] ->
+        raise summarize_legacy_error(result.body["error"])
+
+      result.body["errors"] ->
+        raise summarize_new_error(result.body["errors"])
+
+      true ->
+        nil
+    end
+  end
+
+  defp summarize_legacy_error(error) do
+    error["info"] ||
+      error["code"] ||
+      "Unknown error (legacy format)"
+  end
+
+  defp summarize_new_error(errors) do
+    case(List.first(errors)) do
+      %{"text" => text} -> text
+      %{"html" => html} -> html
+      %{"key" => key, "params" => params} -> [key, params] |> List.flatten() |> Enum.join("-")
+      %{"code" => code} -> code
+      _ -> "unknown"
     end
   end
 
