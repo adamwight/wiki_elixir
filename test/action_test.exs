@@ -132,6 +132,17 @@ defmodule ActionTest do
     assert session.result["query"]["statistics"]["merged"] == true
   end
 
+  test "doesn't collide literal pipes with separator" do
+    TeslaAdapterMock
+    |> expect(:call, fn env, _opts ->
+      assert env.query == [format: :json, multivalue: "\x1fFoo|Bar\x1fBaz"]
+      {:ok, %Env{env | status: 200}}
+    end)
+
+    Action.new("https://dewiki.test/w/api.php")
+    |> Action.get(multivalue: ["Foo|Bar", "Baz"])
+  end
+
   test "posts using body, authenticates using cookie jar" do
     TeslaAdapterMock
     |> expect(:call, fn env, _opts ->

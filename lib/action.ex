@@ -243,9 +243,19 @@ defmodule Wiki.Action do
   defp pipe_lists(params) do
     params
     |> Enum.map(fn
-      {k, v} when is_list(v) -> {k, Enum.join(v, "|")}
+      {k, v} when is_list(v) -> {k, pipe_list(v)}
       entry -> entry
     end)
+  end
+
+  defp pipe_list(values) do
+    if Enum.any?(values, fn v -> String.contains?(to_string(v), "|") end) do
+      # Use a special join character because pipe would conflict with the value.
+      unit_separator = "\x1f"
+      Enum.join([""] ++ values, unit_separator)
+    else
+      Enum.join(values, "|")
+    end
   end
 
   @spec client(list) :: Tesla.Client.t()
