@@ -99,9 +99,10 @@ defmodule Wiki.Action do
   """
   @spec new(String.t(), keyword) :: Session.t()
   def new(url, opts \\ []) do
+    # TODO: This belongs in client/1, maybe pass options through?
     middleware =
       if opts[:accumulate] do
-        [Wiki.Tesla.Middleware.CumulativeResult]
+        [Wiki.StatefulClient.CumulativeResult]
       else
         []
       end ++
@@ -267,7 +268,7 @@ defmodule Wiki.Action do
       extra ++
         [
           {Tesla.Middleware.Compression, format: "gzip"},
-          Wiki.Tesla.Middleware.CookieJar,
+          Wiki.StatefulClient.CookieJar,
           Tesla.Middleware.FormUrlencoded,
           {Tesla.Middleware.Headers,
            [
@@ -282,8 +283,7 @@ defmodule Wiki.Action do
   end
 end
 
-# Note: Relies on local request wrapper to propagate state.
-defmodule Wiki.Tesla.Middleware.CookieJar do
+defmodule Wiki.StatefulClient.CookieJar do
   @moduledoc false
 
   @behaviour Tesla.Middleware
@@ -340,8 +340,7 @@ defmodule Wiki.Tesla.Middleware.CookieJar do
   end
 end
 
-# Note: Relies on local request wrapper to propagate state.
-defmodule Wiki.Tesla.Middleware.CumulativeResult do
+defmodule Wiki.StatefulClient.CumulativeResult do
   @moduledoc false
 
   @behaviour Tesla.Middleware
