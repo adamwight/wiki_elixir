@@ -159,7 +159,7 @@ defmodule Wiki.Action do
   """
   @spec get(Session.t(), keyword, keyword) :: Session.t()
   def get(session, params, opts \\ []),
-    do: request(session, :get, opts ++ [query: normalize_params(params)])
+    do: request!(session, :get, opts ++ [query: normalize_params(params)])
 
   @doc """
   Make an API POST request.
@@ -177,7 +177,7 @@ defmodule Wiki.Action do
   """
   @spec post(Session.t(), keyword, keyword) :: Session.t()
   def post(session, params, opts \\ []),
-    do: request(session, :post, opts ++ [body: normalize_params(params)])
+    do: request!(session, :post, opts ++ [body: normalize_params(params)])
 
   @doc """
   Make a GET request and follow continuations until exhausted or the stream is closed.
@@ -216,8 +216,8 @@ defmodule Wiki.Action do
     {[next.result], {next, :cont}}
   end
 
-  @spec request(Session.t(), :get | :post, keyword) :: Session.t()
-  defp request(session, method, opts) do
+  @spec request!(Session.t(), :get | :post, keyword) :: Session.t()
+  defp request!(session, method, opts) do
     # TODO: This can be extracted into a generic StatefulAdapter now.
     opts = [opts: session.state] ++ opts ++ [method: method]
 
