@@ -41,7 +41,7 @@ defmodule Elixir.MixProject do
       {:excoveralls, "~> 0.12", only: :test},
       {:gen_stage, "~> 1.0"},
       {:git_hooks, "~> 0.0", only: [:dev, :test]},
-      {:hackney, "~> 1.0"},
+      {:hackney, "~> 1.13"},
       {:httpoison, "~> 1.0"},
       {:jason, "~> 1.0"},
       {:mox, "~> 0.5", only: :test},

@@ -159,7 +159,7 @@ defmodule Wiki.Action do
   """
   @spec get(Session.t(), keyword, keyword) :: Session.t()
   def get(session, params, opts \\ []),
-    do: request(session, :get, opts ++ [query: normalize_params(params)])
+    do: request!(session, :get, opts ++ [query: normalize_params(params)])
 
   @doc """
   Make an API POST request.
@@ -177,7 +177,7 @@ defmodule Wiki.Action do
   """
   @spec post(Session.t(), keyword, keyword) :: Session.t()
   def post(session, params, opts \\ []),
-    do: request(session, :post, opts ++ [body: normalize_params(params)])
+    do: request!(session, :post, opts ++ [body: normalize_params(params)])
 
   @doc """
   Make a GET request and follow continuations until exhausted or the stream is closed.
@@ -216,12 +216,14 @@ defmodule Wiki.Action do
     {[next.result], {next, :cont}}
   end
 
-  @spec request(Session.t(), :get | :post, keyword) :: Session.t()
-  defp request(session, method, opts) do
+  @spec request!(Session.t(), :get | :post, keyword) :: Session.t()
+  defp request!(session, method, opts) do
     # TODO: This can be extracted into a generic StatefulAdapter now.
     opts = [opts: session.state] ++ opts ++ [method: method]
 
     result = Tesla.request!(session.__client__, opts)
+
+    assert_success(result)
 
     %Session{
       __client__: session.__client__,
@@ -264,6 +266,41 @@ defmodule Wiki.Action do
       Enum.join([""] ++ values, unit_separator)
     else
       Enum.join(values, "|")
+    end
+  end
+
+  defp assert_success(result) do
+    cond do
+      result.status < 200 or result.status >= 300 ->
+        raise "Error received with HTTP status #{result.status}"
+
+      result.body in [nil, "", %{}] ->
+        raise "Empty response"
+
+      result.body["error"] ->
+        raise summarize_legacy_error(result.body["error"])
+
+      result.body["errors"] ->
+        raise summarize_new_error(result.body["errors"])
+
+      true ->
+        nil
+    end
+  end
+
+  defp summarize_legacy_error(error) do
+    error["info"] ||
+      error["code"] ||
+      "Unknown error (legacy format)"
+  end
+
+  defp summarize_new_error(errors) do
+    case(List.first(errors)) do
+      %{"text" => text} -> text
+      %{"html" => html} -> html
+      %{"key" => key, "params" => params} -> [key, params] |> List.flatten() |> Enum.join("-")
+      %{"code" => code} -> code
+      _ -> "unknown"
     end
   end
 

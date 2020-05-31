@@ -15,7 +15,11 @@ What it should include:
 
 ## 0.1.5a (TBD)
 
-* Test everything.
+* Handle Action API errors: fail fast.
+* Automated tests for both happy and sad cases.
+* Remove unused `Timex` dependency.
+* Incoming query parameters are passed as a keyword list, rather than as a map.
+* Allow literal "|" in parameters by switching the delimiter to "unit separator".
 * Default to `formatversion=2`.
 * ...
 
