@@ -38,6 +38,7 @@ defmodule ActionTest do
       assert env.query == [
                action: :query,
                format: :json,
+               formatversion: 2,
                meta: :siteinfo,
                siprop: :general
              ]
@@ -54,7 +55,6 @@ defmodule ActionTest do
       )
       |> Action.get(
         action: :query,
-        format: :json,
         meta: :siteinfo,
         siprop: :general
       )
@@ -86,6 +86,7 @@ defmodule ActionTest do
       assert env.query == [
                action: :query,
                format: :json,
+               formatversion: 2,
                meta: :siteinfo,
                siprop: "general|statistics"
              ]
@@ -121,7 +122,6 @@ defmodule ActionTest do
       session
       |> Action.get(
         action: :query,
-        format: :json,
         meta: :siteinfo,
         siprop: [:general, :statistics]
       )
@@ -135,7 +135,7 @@ defmodule ActionTest do
   test "doesn't collide literal pipes with separator" do
     TeslaAdapterMock
     |> expect(:call, fn env, _opts ->
-      assert env.query == [format: :json, multivalue: "\x1fFoo|Bar\x1fBaz"]
+      assert env.query[:multivalue] == "\x1fFoo|Bar\x1fBaz"
       {:ok, %Env{env | status: 200}}
     end)
 
@@ -169,7 +169,7 @@ defmodule ActionTest do
       assert env.query == []
 
       assert env.body ==
-               "action=login&format=json&lgname=TestUser%40bot&lgpassword=botpass&lgtoken=5c31497c51b4b28f2d6c19f3349070d25eccae52%2B%5C"
+               "action=login&format=json&formatversion=2&lgname=TestUser%40bot&lgpassword=botpass&lgtoken=5c31497c51b4b28f2d6c19f3349070d25eccae52%2B%5C"
 
       assert List.keyfind(env.headers, "cookie", 0) ==
                {"cookie", "a=b; mediawiki_session=aam5aqq00euke0tn99fin92j4nnbueav"}
@@ -231,6 +231,7 @@ defmodule ActionTest do
       assert env.query == [
                {:action, :query},
                {:format, :json},
+               {:formatversion, 2},
                {:list, :recentchanges},
                {:rclimit, 2},
                {"continue", "-||"},

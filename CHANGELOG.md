@@ -16,6 +16,7 @@ What it should include:
 ## 0.1.5a (TBD)
 
 * Test everything.
+* Default to `formatversion=2`.
 * ...
 
 ## 0.1.4 (May 2020)

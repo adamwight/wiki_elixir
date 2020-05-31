@@ -232,7 +232,12 @@ defmodule Wiki.Action do
 
   @spec normalize_params(keyword) :: keyword
   defp normalize_params(params) do
-    ([format: :json] ++ params)
+    defaults = [
+      format: :json,
+      formatversion: 2
+    ]
+
+    (defaults ++ params)
     |> remove_boolean_false()
     |> pipe_lists()
     |> Enum.sort()
