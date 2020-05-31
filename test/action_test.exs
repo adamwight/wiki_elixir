@@ -50,7 +50,7 @@ defmodule ActionTest do
     session =
       Action.new(
         "https://dewiki.test/w/api.php",
-        [Wiki.Tesla.Middleware.CumulativeResult]
+        accumulate: true
       )
       |> Action.get(
         action: :query,
@@ -96,7 +96,7 @@ defmodule ActionTest do
     session =
       Action.new(
         "https://dewiki.test/w/api.php",
-        [Wiki.Tesla.Middleware.CumulativeResult]
+        accumulate: true
       )
 
     session = %Session{

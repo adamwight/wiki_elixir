@@ -40,13 +40,13 @@ defmodule Wiki.Action do
   |> IO.inspect()
   ```
 
-  Commands can be pipelined to accumulate results, and logged-in user permissions
+  Commands can be pipelined while accumulating results, and logged-in user permissions
   delegated by supplying a [bot password](https://www.mediawiki.org/wiki/Manual:Bot_passwords).
 
   ```elixir
   Wiki.Action.new(
     "https://en.wikipedia.org/w/api.php",
-    [Wiki.Tesla.Middleware.CumulativeResult]
+    accumulate: true
   )
   |> Wiki.Action.authenticate(
     Application.get_env(:example_app, :bot_username),
@@ -94,18 +94,21 @@ defmodule Wiki.Action do
   ## Arguments
 
   - `url` - `api.php` endpoint for the wiki you will connect to.  For example, "https://en.wikipedia.org/w/api.php".
-  - `middleware` - Any additional modules to include, such as Wiki.Tesla.Middleware.CumulativeResult
+  - `opts`
+    - `:accumulate` - Merge results from each step of a pipeline, rather than overwriting with the latest response.
   """
-  @spec new(String.t(), list) :: Session.t()
-  def new(url, middleware \\ []) do
+  @spec new(String.t(), keyword) :: Session.t()
+  def new(url, opts \\ []) do
+    middleware =
+      if opts[:accumulate] do
+        [Wiki.Tesla.Middleware.CumulativeResult]
+      else
+        []
+      end ++
+        [{Tesla.Middleware.BaseUrl, url}]
+
     %Session{
-      __client__:
-        client(
-          middleware ++
-            [
-              {Tesla.Middleware.BaseUrl, url}
-            ]
-        )
+      __client__: client(middleware)
     }
   end
 
