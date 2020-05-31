@@ -316,13 +316,11 @@ defmodule Wiki.StatefulClient.CookieJar do
   end
 
   @spec update_cookies(map, map) :: map
-  defp update_cookies(new_cookies, old_cookies)
-
-  defp update_cookies(new_cookies, nil), do: new_cookies
-
   defp update_cookies(new_cookies, old_cookies) do
-    # TODO: Use a library conforming to RFC 6265, for example respecting expiry.
-    Map.merge(old_cookies, new_cookies)
+    case old_cookies do
+      nil -> new_cookies
+      _ -> Map.merge(old_cookies, new_cookies)
+    end
   end
 
   @spec extract_cookies(Keyword.t()) :: map
