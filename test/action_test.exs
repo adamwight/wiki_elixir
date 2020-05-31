@@ -8,10 +8,12 @@ defmodule ActionTest do
   alias Wiki.Action.Session
   alias Wiki.Tests.TeslaAdapterMock
 
+  @url "https://dewiki.test/w/api.php"
+
   setup :verify_on_exit!
 
   test "returns new session" do
-    session = Action.new("https://dewiki.test/w/api.php")
+    session = Action.new(@url)
     %{__client__: client} = session
     assert length(client.pre) >= 1
   end
@@ -50,7 +52,7 @@ defmodule ActionTest do
 
     session =
       Action.new(
-        "https://dewiki.test/w/api.php",
+        @url,
         accumulate: true
       )
       |> Action.get(
@@ -96,7 +98,7 @@ defmodule ActionTest do
 
     session =
       Action.new(
-        "https://dewiki.test/w/api.php",
+        @url,
         accumulate: true
       )
 
@@ -136,10 +138,10 @@ defmodule ActionTest do
     TeslaAdapterMock
     |> expect(:call, fn env, _opts ->
       assert env.query[:multivalue] == "\x1fFoo|Bar\x1fBaz"
-      {:ok, %Env{env | status: 200}}
+      {:ok, %Env{env | status: 200, body: %{a: 'b'}}}
     end)
 
-    Action.new("https://dewiki.test/w/api.php")
+    Action.new(@url)
     |> Action.get(multivalue: ["Foo|Bar", "Baz"])
   end
 
@@ -191,7 +193,7 @@ defmodule ActionTest do
        }}
     end)
 
-    session = Action.new("https://dewiki.test/w/api.php")
+    session = Action.new(@url)
 
     session =
       %Session{
@@ -255,7 +257,7 @@ defmodule ActionTest do
     end)
 
     recent_changes =
-      Action.new("https://dewiki.test/w/api.php")
+      Action.new(@url)
       |> Action.stream(
         action: :query,
         list: :recentchanges,
