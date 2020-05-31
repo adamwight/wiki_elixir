@@ -237,7 +237,7 @@ defmodule Wiki.Action do
 
   defp remove_boolean_false(params) do
     params
-    |> Enum.filter(fn {_, v} -> v != false end)
+    |> Enum.filter(fn {_, v} -> not (v in [false, nil]) end)
   end
 
   defp pipe_lists(params) do
