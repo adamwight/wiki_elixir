@@ -50,8 +50,8 @@ See the module documentation for detailed usage and more examples.
 
 ### Error handling
 
-Methods are all assertive, and will throw a `RuntimeError` whenever a network
-or API error is detected.
+Methods are all assertive, and will throw a `RuntimeError` with details about the
+API error, or a `Tesla.Error` if a network failure is detected.
 
 ### Defaults
 

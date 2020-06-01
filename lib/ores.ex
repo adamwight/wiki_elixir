@@ -63,6 +63,9 @@ defmodule Wiki.Ores do
   @spec request(Tesla.Client.t(), keyword | map) :: map
   def request(client, params) do
     response = Tesla.get!(client, "/", query: normalize(params))
+
+    assert_success(response)
+
     response.body
   end
 
@@ -80,9 +83,30 @@ defmodule Wiki.Ores do
     end)
   end
 
+  defp assert_success(result) do
+    cond do
+      result.body in [nil, "", %{}] ->
+        raise "Empty response"
 
+      not is_map(result.body) ->
+        raise "Malformed response, HTTP status #{result.status}"
 
+      error = result.body["error"] ->
+        raise summarize_error(error)
 
+      result.status < 200 or result.status >= 300 ->
+        raise "Error received with HTTP status #{result.status}"
+
+      true ->
+        nil
+    end
+  end
+
+  defp summarize_error(error) do
+    error["message"] ||
+      error["code"] ||
+      "unknown"
+  end
 
   @spec client(list) :: Tesla.Client.t()
   defp client(extra) do
