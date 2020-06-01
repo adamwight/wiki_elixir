@@ -17,7 +17,7 @@ defmodule OresTest do
       assert String.match?(user_agent, ~r/wiki_elixir.*\d.*/)
 
       assert env.query == [models: "damaging", revids: 12_345]
-      assert env.url == "https://ores.wikimedia.org/v3/scores/testwiki/"
+      assert env.url == "https://ores.test/v3/scores/testwiki/"
 
       response = %{
         "testwiki" => %{

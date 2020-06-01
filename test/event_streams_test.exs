@@ -12,7 +12,7 @@ defmodule EventStreamsTest do
   test "follows events" do
     HTTPoisonMock
     |> expect(:get!, fn url, headers, options ->
-      assert url == "https://stream.wikimedia.org/v2/stream/revision-create,revision-score"
+      assert url == "https://stream.test/v2/stream/revision-create,revision-score"
       [{"user-agent", user_agent}] = headers
       assert String.match?(user_agent, ~r/wiki_elixir.*\d.*/)
       target = options[:stream_to]
@@ -46,7 +46,7 @@ defmodule EventStreamsTest do
   test "handles single stream" do
     HTTPoisonMock
     |> expect(:get!, fn url, _headers, _options ->
-      assert url == "https://stream.wikimedia.org/v2/stream/revision-create"
+      assert url == "https://stream.test/v2/stream/revision-create"
     end)
 
     # FIXME: Need to kill this process at the end of the test.
