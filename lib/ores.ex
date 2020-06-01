@@ -6,10 +6,10 @@ defmodule Wiki.Ores do
 
   ```elixir
   Wiki.Ores.new("enwiki")
-  |> Wiki.Ores.request(%{
+  |> Wiki.Ores.request(
     models: ["damaging", "wp10"],
     revids: 456789
-  })
+  )
   |> Jason.encode!(pretty: true)
   |> IO.puts()
   ```
@@ -54,33 +54,35 @@ defmodule Wiki.Ores do
   ## Arguments
 
   - `client` - Client object as returned by `new/1`.
-  - `params` - Map of query string parameters,
+  - `params` - Keyword list of query parameters,
     - `:models` - Learning models to query.  These vary per wiki, see the [support matrix](https://tools.wmflabs.org/ores-support-checklist/)
     for availability and to read about what each model is scoring.  Multiple models can be passed as a list, for example,
     `[:damaging, :wp10]`, or as a single atom, `:damaging`.
     - `:revids` - Revision IDs to score, as a single integer or as a list.
   """
-  @spec request(Tesla.Client.t(), map) :: map
+  @spec request(Tesla.Client.t(), keyword | map) :: map
   def request(client, params) do
     response = Tesla.get!(client, "/", query: normalize(params))
     response.body
   end
 
-  @spec normalize(map | Keyword.t()) :: Keyword.t()
-  defp normalize(params)
+  @spec normalize(keyword) :: keyword
+  defp normalize(params) do
+    params
+    |> pipe_lists()
+  end
 
-  defp normalize(%{} = params), do: normalize(Map.to_list(params))
+  defp pipe_lists(params) do
+    params
+    |> Enum.map(fn
+      {k, v} when is_list(v) -> {k, Enum.join(v, "|")}
+      entry -> entry
+    end)
+  end
 
-  defp normalize([{k, v} | tail]), do: [{k, normalize_value(v)} | normalize(tail)]
 
-  defp normalize([]), do: []
 
-  @spec normalize_value(String.t() | atom | [String.t() | atom]) :: String.t() | atom
-  defp normalize_value(value)
 
-  defp normalize_value(value) when is_list(value), do: Enum.join(value, "|")
-
-  defp normalize_value(value), do: value
 
   @spec client(list) :: Tesla.Client.t()
   defp client(extra) do
