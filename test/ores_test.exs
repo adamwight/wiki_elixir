@@ -17,7 +17,7 @@ defmodule OresTest do
       assert String.match?(user_agent, ~r/wiki_elixir.*\d.*/)
 
       assert env.query == [models: "damaging", revids: 12_345]
-      assert env.url == "https://ores.wikimedia.org/v3/scores/testwiki/"
+      assert env.url == "https://ores.test/v3/scores/testwiki/"
 
       response = %{
         "testwiki" => %{
@@ -45,7 +45,7 @@ defmodule OresTest do
 
     session =
       Ores.new("testwiki")
-      |> Wiki.Ores.request(%{
+      |> Ores.request(%{
         models: "damaging",
         revids: 12_345
       })
@@ -122,11 +122,94 @@ defmodule OresTest do
 
     session =
       Ores.new("testwiki")
-      |> Wiki.Ores.request(%{
+      |> Ores.request(%{
         models: ~w(damaging wp10),
         revids: [12_345, 67_890]
       })
 
     assert session["testwiki"]["scores"]["67890"]["wp10"]["score"]["prediction"] == "Start"
+  end
+
+  test "handles network error" do
+    TeslaAdapterMock
+    |> expect(:call, fn _env, _opts ->
+      {:error, :nxdomain}
+    end)
+
+    error =
+      assert_raise Tesla.Error, fn ->
+        Ores.new("testwiki")
+        |> Ores.request(%{})
+      end
+
+    assert error.reason == :nxdomain
+  end
+
+  test "handles empty success" do
+    TeslaAdapterMock
+    |> expect(:call, fn env, _opts ->
+      {:ok, %Env{env | status: 200, body: ""}}
+    end)
+
+    error =
+      assert_raise RuntimeError, fn ->
+        Ores.new("testwiki")
+        |> Ores.request(%{})
+      end
+
+    assert error.message == "Empty response"
+  end
+
+  test "handles malformed JSON" do
+    TeslaAdapterMock
+    |> expect(:call, fn env, _opts ->
+      body = "<html><head><title>Not found!</title></head></html>"
+      {:ok, %Env{env | status: 404, body: body}}
+    end)
+
+    error =
+      assert_raise RuntimeError, fn ->
+        Ores.new("testwiki")
+        |> Ores.request(%{})
+      end
+
+    assert error.message == "Malformed response, HTTP status 404"
+  end
+
+  test "handles server error" do
+    TeslaAdapterMock
+    |> expect(:call, fn env, _opts ->
+      {:ok, %Env{env | status: 500, body: %{"foo" => "bar"}}}
+    end)
+
+    error =
+      assert_raise RuntimeError, fn ->
+        Ores.new("testwiki")
+        |> Ores.request(%{})
+      end
+
+    assert error.message == "Error received with HTTP status 500"
+  end
+
+  test "handles API error with 404" do
+    TeslaAdapterMock
+    |> expect(:call, fn env, _opts ->
+      body = %{
+        "error" => %{
+          "code" => "not found",
+          "message" => "No scorers available for zenwiki"
+        }
+      }
+
+      {:ok, %Env{env | status: 404, body: body}}
+    end)
+
+    error =
+      assert_raise RuntimeError, fn ->
+        Ores.new("zenwiki")
+        |> Ores.request(%{})
+      end
+
+    assert error.message == "No scorers available for zenwiki"
   end
 end

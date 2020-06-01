@@ -11,6 +11,10 @@ Distant future, won't attempt in v0.2:
 What it should include:
 * Detect server and network errors, fail fast.
 * Atoms for selecting the known server-side event streams?
+* Client for the many Wikimedia [REST API](https://www.mediawiki.org/wiki/REST_API )s
+served through RESTBase. See [issue #2](https://gitlab.com/adamwight/wiki_elixir/-/issues/2)
+* Built-in Mediawiki [REST API](https://www.mediawiki.org/wiki/API:REST_API)
+(yes, that's something different than the above!).
 * ...
 
 ## 0.1.5a (TBD)

@@ -6,10 +6,10 @@ defmodule Wiki.Ores do
 
   ```elixir
   Wiki.Ores.new("enwiki")
-  |> Wiki.Ores.request(%{
+  |> Wiki.Ores.request(
     models: ["damaging", "wp10"],
     revids: 456789
-  })
+  )
   |> Jason.encode!(pretty: true)
   |> IO.puts()
   ```
@@ -27,7 +27,7 @@ defmodule Wiki.Ores do
 
   ## Arguments
 
-  - `project` - Short code for the wiki where your articles are stored.  For example, "enwiki" for English Wikipedia.
+  - `project` - Short code for the wiki where your articles appear.  For example, "enwiki" for English Wikipedia.
 
   ## Return value
 
@@ -54,33 +54,59 @@ defmodule Wiki.Ores do
   ## Arguments
 
   - `client` - Client object as returned by `new/1`.
-  - `params` - Map of query string parameters,
+  - `params` - Keyword list of query parameters,
     - `:models` - Learning models to query.  These vary per wiki, see the [support matrix](https://tools.wmflabs.org/ores-support-checklist/)
     for availability and to read about what each model is scoring.  Multiple models can be passed as a list, for example,
     `[:damaging, :wp10]`, or as a single atom, `:damaging`.
     - `:revids` - Revision IDs to score, as a single integer or as a list.
   """
-  @spec request(Tesla.Client.t(), map) :: map
+  @spec request(Tesla.Client.t(), keyword | map) :: map
   def request(client, params) do
     response = Tesla.get!(client, "/", query: normalize(params))
+
+    assert_success(response)
+
     response.body
   end
 
-  @spec normalize(map | Keyword.t()) :: Keyword.t()
-  defp normalize(params)
+  @spec normalize(keyword) :: keyword
+  defp normalize(params) do
+    params
+    |> pipe_lists()
+  end
 
-  defp normalize(%{} = params), do: normalize(Map.to_list(params))
+  defp pipe_lists(params) do
+    params
+    |> Enum.map(fn
+      {k, v} when is_list(v) -> {k, Enum.join(v, "|")}
+      entry -> entry
+    end)
+  end
 
-  defp normalize([{k, v} | tail]), do: [{k, normalize_value(v)} | normalize(tail)]
+  defp assert_success(result) do
+    cond do
+      result.body in [nil, "", %{}] ->
+        raise "Empty response"
 
-  defp normalize([]), do: []
+      not is_map(result.body) ->
+        raise "Malformed response, HTTP status #{result.status}"
 
-  @spec normalize_value(String.t() | atom | [String.t() | atom]) :: String.t() | atom
-  defp normalize_value(value)
+      error = result.body["error"] ->
+        raise summarize_error(error)
 
-  defp normalize_value(value) when is_list(value), do: Enum.join(value, "|")
+      result.status < 200 or result.status >= 300 ->
+        raise "Error received with HTTP status #{result.status}"
 
-  defp normalize_value(value), do: value
+      true ->
+        nil
+    end
+  end
+
+  defp summarize_error(error) do
+    error["message"] ||
+      error["code"] ||
+      "unknown"
+  end
 
   @spec client(list) :: Tesla.Client.t()
   defp client(extra) do

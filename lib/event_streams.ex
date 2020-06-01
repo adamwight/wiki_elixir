@@ -187,6 +187,10 @@ defmodule Wiki.EventStreams do
   @doc false
   @spec default_endpoint() :: String.t()
   def default_endpoint do
-    "https://stream.wikimedia.org/v2/stream/"
+    Application.get_env(
+      :wiki_elixir,
+      :eventstream_endpoint,
+      "https://stream.wikimedia.org/v2/stream/"
+    )
   end
 end

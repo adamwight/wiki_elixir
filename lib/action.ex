@@ -277,11 +277,11 @@ defmodule Wiki.Action do
       result.body in [nil, "", %{}] ->
         raise "Empty response"
 
-      result.body["error"] ->
-        raise summarize_legacy_error(result.body["error"])
+      errors = result.body["errors"] ->
+        raise summarize_new_error(errors)
 
-      result.body["errors"] ->
-        raise summarize_new_error(result.body["errors"])
+      error = result.body["error"] ->
+        raise summarize_legacy_error(error)
 
       true ->
         nil
