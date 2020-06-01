@@ -60,6 +60,19 @@ Some parameters are set by default, but can be overridden by including in the qu
 * The `:format` parameter defaults to `:json`.
 * `:formatversion` defaults to `2`.
 
+A few configuration variables are available under the `:wiki_elixir` application,
+but aren't necessary for normal use.  Example overrides can be seen in
+[config/test.exs](config/test.exs), in this case to mock network access.
+
+* `:eventsource_adapter` - Defaults to `HTTPoison`, this will be used for the
+EventStreams HTTP client.
+* `:eventstream_endpoint` - API endpoint for `Wiki.EventStreams`, might be
+overridden to target a staging server for example.
+* `:ores_endpoint` - API endpoint for `Wiki.Ores`.
+* `:tesla_adapter` - This will fall back to `Tesla.Adapter.Hackney`, as a stable
+client which performs certificate validation.
+* `:user_agent` - Sent in request headers, defaults to `wiki_elixir/<version>`...
+
 ## Development
 
 The [project's homepage](https://gitlab.com/adamwight/wiki_elixir) is currently on GitLab.
