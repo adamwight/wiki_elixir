@@ -2,22 +2,20 @@
 
 Unofficial Elixir client modules for Wikipedia and other MediaWiki sites.
 
-Currently supported,
-* `Wiki.Action` to access the [Action API](https://www.mediawiki.org/wiki/Special:MyLanguage/API:Main_page).
-This is a rich set of commands to query or edit almost anything on a wiki.
+About the current version: [Documentation and examples](https://hexdocs.pm/wiki_elixir/api-reference.html)
+
+Overview:
+* `Wiki.Action` connects to the [Action API](https://www.mediawiki.org/wiki/Special:MyLanguage/API:Main_page),
+a rich set of commands to query or edit almost anything on a wiki.
 * `Wiki.EventStreams` to access [EventStreams](https://wikitech.wikimedia.org/wiki/Event_Platform/EventStreams),
 a real-time feed of events.
 * `Wiki.Ores` to access the [ORES](https://www.mediawiki.org/wiki/ORES) service [API](https://ores.wikimedia.org/v3/),
 machine-learning models for estimating revision and edit quality.
 
-Considered for a future version,
-* Client for the many Wikimedia [REST API](https://www.mediawiki.org/wiki/REST_API )s served through RESTBase.
-See [issue #2](https://gitlab.com/adamwight/wiki_elixir/-/issues/2)
-* Built-in [REST API](https://www.mediawiki.org/wiki/API:REST_API).
-
-Everything you'll find here is beta-quality, please suggest improvements.  Expect the
-public interface to change, this project uses [semantic versioning](https://semver.org/) and
-the "0.x" releases should be taken literally.
+This library is beta-quality, and written by an beginner Elixir probrammer so
+please suggest improvements.  The public interface will evolve, and the
+[0.x](https://semver.org/) releases in particular are likely to include breaking changes
+between versions.  These will be documented in the [change log](CHANGELOG.md).
 
 ## Installation
 
@@ -50,8 +48,17 @@ Wiki.Action.new("https://de.wikipedia.org/w/api.php")
 
 See the module documentation for detailed usage and more examples.
 
-The `:format` parameter defaults to `:json` and can be omitted unless you mean to
-override the returned format.
+### Error handling
+
+Methods are all assertive, and will throw a `RuntimeError` whenever a network
+or API error is detected.
+
+### Defaults
+
+Some parameters are set by default, but can be overridden by including in the query.
+
+* The `:format` parameter defaults to `:json`.
+* `:formatversion` defaults to `2`.
 
 ## Development
 

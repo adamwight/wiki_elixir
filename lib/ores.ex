@@ -27,7 +27,7 @@ defmodule Wiki.Ores do
 
   ## Arguments
 
-  - `project` - Short code for the wiki where your articles are stored.  For example, "enwiki" for English Wikipedia.
+  - `project` - Short code for the wiki where your articles appear.  For example, "enwiki" for English Wikipedia.
 
   ## Return value
 
