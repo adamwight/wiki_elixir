@@ -12,7 +12,7 @@ a real-time feed of events.
 * `Wiki.Ores` to access the [ORES](https://www.mediawiki.org/wiki/ORES) service [API](https://ores.wikimedia.org/v3/),
 machine-learning models for estimating revision and edit quality.
 
-This library is beta-quality, and written by an beginner Elixir probrammer so
+This library is beta-quality, and written by an beginning Elixir programmer so
 please suggest improvements.  The public interface will evolve, and the
 [0.x](https://semver.org/) releases in particular are likely to include breaking changes
 between versions.  These will be documented in the [change log](CHANGELOG.md).
